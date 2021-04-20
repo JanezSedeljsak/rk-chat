@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.3.0/mdb.min.css" rel="stylesheet" />
+    <title>RKChat - Web client</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.3.0/mdb.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
+
+        :root {
+            --myred: #cc3d12;
+            --msg: #c55d3d;
+        }
+
+        body {
+            background-image: url(https://wallpaperaccess.com/full/1761720.jpg);
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        small {
+            font-size: 13px
+        }
+
+        hr {
+            margin: 2px;
+        }
+
+        .card,
+        .card-body {
+            border-radius: 5px
+        }
+
+        .chat-continaner {
+            position: absolute;
+            top: 10vh;
+            left: 25vw;
+            width: 50vw;
+        }
+
+        .form-control {
+            outline: none !important;
+            border: 1px solid transparent;
+            user-select: none !important;
+        }
+
+        .form-control:focus {
+            outline: none !important;
+            outline-color: transparent !important;
+        }
+
+        .my-submit {
+            background-color: var(--myred) !important;
+        }
+
+        .fancy-header {
+            font-family: 'Monoton', cursive;
+            color: var(--myred);
+        }
+
+        .message-box {
+            background-color: var(--msg);
+            opacity: 0.8;
+            padding: 5px;
+            border-radius: 10px;
+            width: 100%;
+            margin-bottom: 5px;
+            width: 35%;
+            border-bottom-right-radius: 30px;
+        }
+
+        .my-message-box {
+            text-align: right;
+            margin-left: 65%;
+            border-bottom-right-radius: 10px;
+            border-bottom-left-radius: 30px;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script>
+        const app = angular.module("rkchat", []);
+
+        app.controller("rkchat_controller", $scope => {
+            $scope.userOnline = true;
+            $scope.username = "Kekec";
+            $scope.messages = [
+                { 'sender': 'Janez', 'timestamp': '20:45', 'message': 'test test' },
+                { 'sender': '_', 'timestamp': '20:45', 'message': 'test test' },
+                { 'sender': 'Janez', 'timestamp': '20:45', 'message': 'test test' },
+                { 'sender': '_', 'timestamp': '20:45', 'message': 'test test' },
+                { 'sender': 'Janez', 'timestamp': '20:45', 'message': 'test test' },
+                { 'sender': '_', 'timestamp': '20:45', 'message': 'test test' }
+            ];
+
+            $scope.enterChat = () => {
+                $scope.userOnline = true;
+                // @TODO connect to socket
+            }
+
+        });
+    </script>
+</head>
+
+<body ng-app="rkchat" ng-controller="rkchat_controller">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="navbarExample01">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item active">
+                        <span class="nav-link">{{ userOnline ? username : "Guest" }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main ng-if="!userOnline">
+        <span style="font-size: 10vh;" class="fancy-header">RK - Chat</span>
+        <div class="card">
+            <div class="card-body bg-dark">
+                <h4 class="card-title">Enter your name and enter the chat...</h4>
+                <input class="form-control bg-dark" style="border-color: var(--myred)" ng-model="username" />
+                <br />
+                <button type="submit" ng-disabled="username.length < 4" class="btn btn-danger btn-block my-submit"
+                    ng-click="enterChat()">Submit</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="card bg-dark chat-continaner" style="padding: 6px" ng-if="userOnline">
+        <ul class="nav nav-pills nav-fill mb-3">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="ex2-tab-1" data-mdb-toggle="pill" href="#ex2-pills-1" role="tab"
+                    aria-controls="ex2-pills-1" aria-selected="true">Link</a>
+            </li>
+        </ul>
+        <span style="font-size: 3vh;" class="fancy-header">Public chat</span>
+        <hr />
+        <div style="height: 50vh; overflow-y: scroll;">
+            <div class="message-box" ng-repeat="message in messages"
+                ng-class="{'my-message-box': message.sender == '_'}">
+                <span>{{ message.message }}</span>
+                <hr />
+                <small>
+                    <span ng-if="message.sender != '_'">{{ message.sender }} - </span>{{ message.timestamp}}
+                </small>
+            </div>
+        </div>
+        <hr />
+        <input placeholder="enter message..." class="form-control bg-dark" ng-model="message" />
+        </main>
+</body>
+
+</html>
