@@ -5,10 +5,16 @@
     --msg: #c55d3d;
 }
 
+body, html {
+    height: 100%;
+}
+
 body {
     background-image: url(https://wallpaperaccess.com/full/1761720.jpg);
     background-size: cover;
     background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
 }
 
 main {
@@ -55,6 +61,7 @@ hr {
     top: 10vh;
     left: 25vw;
     width: 50vw;
+    z-index: 9;
 }
 
 .form-control {

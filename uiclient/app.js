@@ -1,14 +1,20 @@
 const app = angular.module("rkchat", []);
+const net = require('net');
 
 function capFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
 app.controller("rkchat_controller", $scope => {
-    $scope.SOCKET = new WebSocket('wss://localhost:8888'); // global socket variable
-    $scope.SOCKET.onmessage = function(event) {
-        console.log(event.data);
-    } 
+    var client = new net.Socket();
+    client.connect(4444, '127.0.0.1', function() {
+        console.log('Connected');
+        client.write('Hello, server! Love, Client.');
+    });
+
+    client.on('data', function(data) {
+        console.log('Received: ' + data);
+    });
 
     $scope.userOnline = false;
     $scope.username = null;
@@ -21,13 +27,14 @@ app.controller("rkchat_controller", $scope => {
     $scope.enterChat = () => {
         $scope.username = capFirstLetter(document.getElementById('username').value);
         $scope.userOnline = true;
-        $scope.connectToSocket(username);
         Swal.fire({
             position: 'top-end',
             icon: 'success',
             title: `You have just logged in as ${$scope.username}`,
             showConfirmButton: false,
             timer: 1500
+        }).then(() => {
+            dragElement(document.getElementById("main-continer"));
         });
         // @TODO connect to socket
     }
@@ -52,7 +59,6 @@ app.controller("rkchat_controller", $scope => {
     }
 
     $scope.logout = () => {
-        $scope.SOCKET.close();
         $scope.userOnline = false;
         $scope.username = "";
         Swal.fire({
@@ -65,11 +71,11 @@ app.controller("rkchat_controller", $scope => {
     }
 
     $scope.sendMessage = () => {
-        debugger;
+        const messageVal = document.getElementById('message').value;
         const currentDate = new Date();
-        if (!$scope.message) return; // if no message don't send
+        if (!messageVal) return; // if no message don't send
         let data = {
-            message: $scope.message,
+            message: messageVal,
             timestamp: `${currentDate.getHours()}:${currentDate.getMinutes()}`,
             username: $scope.username,
         }
@@ -82,7 +88,8 @@ app.controller("rkchat_controller", $scope => {
             ...data,
             username: '_'
         });
-        $scope.message = ""; // reset input
+
+        document.getElementById('message').value = ""; // reset input
     }
 
 });

@@ -15,65 +15,37 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@3/dark.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9/dist/sweetalert2.min.js"></script>
     <script src="app.js"></script>
+    <script src="drag.js"></script>
 </head>
 
 <body ng-app="rkchat" ng-controller="rkchat_controller">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container-fluid">
-            <div class="collapse navbar-collapse" id="navbarExample01">
-                <ul ng-if="userOnline" class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item active">
-                        <span class="nav-link">You are logged in as: 
-                        <span style="font-weight: 800; color: var(--myred)">
-                            {{ username }}
-                        <span/></span>
-                    </li>
-                    <li class="nav-item active hoverable">
-                        <span ng-click="logout()" class="nav-link">Logout</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
     <main ng-if="!userOnline">
         <span style="font-size: 10vh;" class="fancy-header">RK - Chat</span>
         <div class="card">
             <div class="card-body bg-dark">
                 <h4 class="card-title">Enter your name and enter the chat...</h4>
-                <input 
-                    id="username" 
-                    ng-model="username"
-                    class="form-control bg-dark" 
-                    style="border-color: var(--myred)" 
-                    ng-keydown="($event.keyCode === 13 && username.length > 3) && enterChat()"
-                />
+                <input id="username" ng-model="username" class="form-control bg-dark" style="border-color: var(--myred)"
+                    ng-keydown="($event.keyCode === 13 && username.length > 3) && enterChat()" />
                 <br />
-                <button 
-                    type="submit" 
-                    ng-disabled="username.length < 4" 
-                    class="btn btn-danger btn-block my-submit"
+                <button type="submit" ng-disabled="username.length < 4" class="btn btn-danger btn-block my-submit"
                     ng-click="enterChat()">Submit</button>
             </div>
         </div>
     </main>
 
-    <div class="card bg-dark chat-continaner" ng-if="userOnline">
-        <div class="chat-header">
+
+    <div id="main-continer" class="card bg-dark chat-continaner" ng-if="userOnline">
+        <div id="main-continer-header" class="chat-header">
             <button class="fancy-header group-btn" ng-click="addGroup()">
                 <i class="fas fa-plus-circle"></i>
             </button>
-            <button class="fancy-header group-btn" 
-                    ng-repeat="(group, data) in groups track by $index"
-                    ng-click="changeGroup(group)"
-                    ng-class="{'active-box': group == currentGroup}">
+            <button class="fancy-header group-btn" ng-repeat="(group, data) in groups track by $index"
+                ng-click="changeGroup(group)" ng-class="{'active-box': group == currentGroup}">
                 {{ group }}
             </button>
         </div>
         <div style="height: 50vh; overflow-y: scroll;">
-            <div 
-                class="message-box" 
-                ng-repeat="message in groups[currentGroup]"
+            <div class="message-box" ng-repeat="message in groups[currentGroup]"
                 ng-class="{'my-message-box': message.username == '_'}">
                 <span>{{ message.message }}</span>
                 <hr />
@@ -83,13 +55,9 @@
             </div>
         </div>
         <hr />
-        <input 
-            id="message"
-            placeholder="enter message..." 
-            ng-keydown="$event.keyCode === 13 && sendMessage()"
-            ng-model="message"
-            class="form-control bg-dark" />
-        </main>
+        <input id="message" placeholder="enter message..." ng-keydown="$event.keyCode === 13 && sendMessage()"
+            ng-model="message" class="form-control bg-dark" />
+    </div>
 </body>
 
 </html>
