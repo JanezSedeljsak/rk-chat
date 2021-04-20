@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
+
+:root {
+    --myred: #cc3d12;
+    --msg: #c55d3d;
+}
+
+body {
+    background-image: url(https://wallpaperaccess.com/full/1761720.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column;
+}
+
+::-webkit-scrollbar {
+    width: 7px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+small {
+    font-size: 13px
+}
+
+hr {
+    margin: 2px;
+}
+
+.card,
+.card-body {
+    border-radius: 5px
+}
+
+.chat-continaner {
+    position: absolute;
+    top: 10vh;
+    left: 25vw;
+    width: 50vw;
+}
+
+.form-control {
+    outline: none !important;
+    border: 1px solid transparent;
+    user-select: none !important;
+}
+
+.form-control:focus {
+    outline: none !important;
+    outline-color: transparent !important;
+}
+
+.my-submit {
+    background-color: var(--myred) !important;
+}
+
+.fancy-header {
+    background-color: transparent;
+    font-family: 'Monoton', cursive;
+    color: var(--myred);
+    border: none;
+}
+
+.message-box {
+    background-color: var(--msg);
+    opacity: 0.8;
+    padding: 5px;
+    border-radius: 10px;
+    width: 100%;
+    margin-bottom: 5px;
+    width: 35%;
+    border-bottom-right-radius: 30px;
+}
+
+.my-message-box {
+    text-align: right;
+    margin-left: 65%;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 30px;
+}
+
+.chat-header {
+    background-color: #333; 
+    margin-bottom: 20px;
+    box-shadow: 0 4px 2px -2px #0000009c;
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+
+.group-btn {
+    font-size: 3vh;
+}
+
+.group-btn:hover {
+    color: var(--msg);
+}
