@@ -18,25 +18,43 @@ app.controller("rkchat_controller", $scope => {
 
     $scope.userOnline = false;
     $scope.username = null;
-    $scope.currentGroup = 'public';
     $scope.message = "";
     $scope.groups = {
         'public': []
     }
 
     $scope.enterChat = () => {
-        $scope.username = capFirstLetter(document.getElementById('username').value);
-        $scope.userOnline = true;
         Swal.fire({
-            position: 'top-end',
-            icon: 'success',
-            title: `You have just logged in as ${$scope.username}`,
-            showConfirmButton: false,
-            timer: 1500
-        }).then(() => {
-            dragElement(document.getElementById("main-continer"));
+            title: 'Enter your username',
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Enter chat',
+        }).then((input) => {
+            if (input.value.length > 3) {
+                $scope.username = capFirstLetter(input.value);
+                $scope.userOnline = true;
+                $scope.$apply();
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: `You have just logged in as ${$scope.username}`,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    dragElement(document.getElementById("public-continer"));
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'You need to have atleast 4 characters in your name!',
+                });
+            }
+
         });
-        // @TODO connect to socket
     }
 
     $scope.addGroup = () => {
@@ -49,13 +67,11 @@ app.controller("rkchat_controller", $scope => {
             showCancelButton: true,
             confirmButtonText: 'Add user to groups',
         }).then((input) => {
-            $scope.groups[capFirstLetter(input.value)] = [];
+            const groupName = capFirstLetter(input.value);
+            $scope.groups[groupName] = [];
             $scope.$apply();
+            dragElement(document.getElementById(`${groupName}-continer`));
         });
-    }
-
-    $scope.changeGroup = groupName => {
-        $scope.currentGroup = groupName;
     }
 
     $scope.logout = () => {
@@ -70,8 +86,8 @@ app.controller("rkchat_controller", $scope => {
         });
     }
 
-    $scope.sendMessage = () => {
-        const messageVal = document.getElementById('message').value;
+    $scope.sendMessage = (group) => {
+        const messageVal = document.getElementById(`${group}-message`).value;
         const currentDate = new Date();
         if (!messageVal) return; // if no message don't send
         let data = {
@@ -84,12 +100,8 @@ app.controller("rkchat_controller", $scope => {
             data['reciver'] = $scope.currentGroup;
         }
 
-        $scope.groups[$scope.currentGroup].push({
-            ...data,
-            username: '_'
-        });
-
-        document.getElementById('message').value = ""; // reset input
+        $scope.groups[group].push({ ...data, username: '_' });
+        document.getElementById(`${group}-message`).value = ""; // reset input
     }
 
 });

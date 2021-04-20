@@ -51,6 +51,10 @@ hr {
     margin: 2px;
 }
 
+nav {
+    height: 50px !important;
+}
+
 .card,
 .card-body {
     border-radius: 5px
@@ -106,10 +110,10 @@ hr {
 
 .chat-header {
     background-color: #333; 
-    margin-bottom: 20px;
     box-shadow: 0 4px 2px -2px #0000009c;
-    overflow-x: scroll;
-    white-space: nowrap;
+    padding-left: 10px;
+    font-size: 25px;
+    margin-bottom: 20px;
 }
 
 .group-btn {
