@@ -12,7 +12,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.3.0/mdb.min.js"></script>
     <link href="global.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@3/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9/dist/sweetalert2.min.js"></script>
     <script src="app.js"></script>
 </head>
 
@@ -27,7 +28,7 @@
                             {{ username }}
                         <span/></span>
                     </li>
-                    <li class="nav-item active">
+                    <li class="nav-item active hoverable">
                         <span ng-click="logout()" class="nav-link">Logout</span>
                     </li>
                 </ul>
@@ -40,9 +41,18 @@
         <div class="card">
             <div class="card-body bg-dark">
                 <h4 class="card-title">Enter your name and enter the chat...</h4>
-                <input id="username" class="form-control bg-dark" style="border-color: var(--myred)" />
+                <input 
+                    id="username" 
+                    ng-model="username"
+                    class="form-control bg-dark" 
+                    style="border-color: var(--myred)" 
+                    ng-keydown="($event.keyCode === 13 && username.length > 3) && enterChat()"
+                />
                 <br />
-                <button type="submit" ng-disabled="username.length < 4" class="btn btn-danger btn-block my-submit"
+                <button 
+                    type="submit" 
+                    ng-disabled="username.length < 4" 
+                    class="btn btn-danger btn-block my-submit"
                     ng-click="enterChat()">Submit</button>
             </div>
         </div>
@@ -55,7 +65,8 @@
             </button>
             <button class="fancy-header group-btn" 
                     ng-repeat="(group, data) in groups track by $index"
-                    ng-click="changeGroup(group)">
+                    ng-click="changeGroup(group)"
+                    ng-class="{'active-box': group == currentGroup}">
                 {{ group }}
             </button>
         </div>
@@ -63,16 +74,21 @@
             <div 
                 class="message-box" 
                 ng-repeat="message in groups[currentGroup]"
-                ng-class="{'my-message-box': message.sender == '_'}">
+                ng-class="{'my-message-box': message.username == '_'}">
                 <span>{{ message.message }}</span>
                 <hr />
                 <small>
-                    <span ng-if="message.sender != '_'">{{ message.sender }} - </span>{{ message.timestamp}}
+                    <span ng-if="message.username != '_'">{{ message.username }} - </span>{{ message.timestamp}}
                 </small>
             </div>
         </div>
         <hr />
-        <input placeholder="enter message..." class="form-control bg-dark" ng-model="message" />
+        <input 
+            id="message"
+            placeholder="enter message..." 
+            ng-keydown="$event.keyCode === 13 && sendMessage()"
+            ng-model="message"
+            class="form-control bg-dark" />
         </main>
 </body>
 

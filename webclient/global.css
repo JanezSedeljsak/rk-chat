@@ -112,3 +112,15 @@ hr {
 .group-btn:hover {
     color: var(--msg);
 }
+
+.swal2-confirm {
+    background-color: var(--myred) !important;
+}
+
+.hoverable:hover {
+    cursor: pointer;
+}
+
+.active-box {
+    text-decoration: underline;
+}

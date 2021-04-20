@@ -4,7 +4,7 @@ import struct
 from json import dumps
 
 # config
-PORT = 1234
+PORT = 8888
 HEADER_LENGTH = 2
 
 class RKChatHelpers:
