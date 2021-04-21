@@ -23,23 +23,25 @@
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
             <form class="d-flex input-group w-auto">
-                <button class="fancy-header group-btn" ng-click="exit()">
+                <button data-tooltip="Exit" class="fancy-header group-btn" ng-click="exit()">
                     <i class="fas fa-times-circle"></i>
                 </button>
-                <button class="fancy-header group-btn" ng-click="minimize()">
+                <button data-tooltip="Minimize" class="fancy-header group-btn" ng-click="minimize()">
                     <i class="fas fa-minus-circle"></i>
                 </button>
-                <button 
-                    class="fancy-header group-btn"
-                    ng-class="{'disabled': userOnline == false }"
-                    ng-click="logout()" 
-                    ng-disabled="!userOnline">
+                <button data-tooltip="Logout" class="fancy-header group-btn"
+                    ng-class="{'disabled': userOnline == false }" ng-click="logout()" ng-disabled="!userOnline">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
-                <button class="fancy-header group-btn" ng-click="!userOnline ? enterChat() : addGroup()">
-                    <i class="{{ userOnline ? 'fas fa-plus-circle': 'fas fa-key' }}"></i>
+                <button data-tooltip="Add chat" class="fancy-header group-btn" ng-click="userOnline ? addGroup() : null"
+                    ng-show="userOnline">
+                    <i class="fas fa-plus-circle"></i>
                 </button>
-                <span style="font-size: 25px; margin-right: 10px" class="fancy-header">RK - Chat</span>
+                <button data-tooltip="Join chat" class="fancy-header group-btn"
+                    ng-click="!userOnline ? enterChat() : null" ng-show="!userOnline">
+                    <i class="fas fa-key"></i>
+                </button>
+                <span style="font-size: 25px; margin-left: 10px" class="fancy-header">RK-Chat</span>
             </form>
         </div>
     </nav>
@@ -48,6 +50,7 @@
         ng-repeat="(group, data) in groups track by $index">
         <div id="{{ group }}-continer-header" class="chat-header">
             <span class="fancy-header">{{ group }}</span>
+            <i class="fas fa-times-circle chat-exit" ng-click="closeChat(group)"></i>
         </div>
         <div style="height: 50vh; overflow-y: scroll;">
             <div class="message-box" ng-repeat="message in groups[group] | orderBy:'timestamp'"
@@ -60,8 +63,8 @@
             </div>
         </div>
         <hr />
-        <input id="{{ group }}-message" placeholder="enter message..." ng-keydown="$event.keyCode === 13 && sendMessage(group)"
-            ng-model="message" class="form-control bg-dark" />
+        <input id="{{ group }}-message" placeholder="enter message..." ng-model="message" class="form-control bg-dark"
+            ng-keydown="$event.keyCode === 13 && sendMessage(group)" />
     </div>
 </body>
 

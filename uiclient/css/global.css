@@ -1,155 +1,178 @@
-@import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap");
 
 :root {
-    --myred: #cc3d12;
-    --msg: #c55d3d;
+  --myred: #cc3d12;
+  --msg: #c55d3d;
 }
 
-body, html {
-    height: 100%;
-    overflow: hidden;
+body,
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+*:not(i) {
+  font-family: "Roboto Mono", monospace !important;
 }
 
 #drag {
-    position: absolute;
-    -webkit-app-region: drag;
-    top: 0;
-    left: 15vw;
-    height: 50px;
-    width: 85vw;
-    display: inline-block;
+  position: absolute;
+  -webkit-app-region: drag;
+  top: 0;
+  left: 15vw;
+  height: 50px;
+  width: 85vw;
+  display: inline-block;
 }
 
 body {
-    background-image: url(https://wallpaperaccess.com/full/1761720.jpg);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: right center;
+  background-image: url(https://wallpaperaccess.com/full/1761720.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: right center;
 }
 
 main {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100vw;
-    height: 100vh;
-    flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  flex-direction: column;
 }
 
 ::-webkit-scrollbar {
-    width: 7px;
+  width: 7px;
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 5px;
+  background: #888;
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+  background: #555;
 }
 
 small {
-    font-size: 13px
+  font-size: 13px;
 }
 
 hr {
-    margin: 2px;
+  margin: 2px;
 }
 
 nav {
-    height: 50px !important;
-    box-shadow: 0 10px 20px 0 #0c0c0cb9;
+  height: 50px !important;
+  box-shadow: 0 10px 20px 0 #0c0c0cb9;
 }
 
 .card,
 .card-body {
-    border-radius: 5px
+  border-radius: 5px;
 }
 
 .chat-container {
-    position: absolute;
-    top: 10vh;
-    left: 25vw;
-    width: 50vw;
-    z-index: 9;
+  position: absolute;
+  top: 10vh;
+  left: 25vw;
+  width: 50vw;
+  z-index: 9;
+  box-shadow: 0 4px 2px -2px #0000009c;
+}
+
+.chat-exit {
+    position: absolute; 
+    right: 10px; 
+    top: 8px; 
 }
 
 .form-control {
-    outline: none !important;
-    border: 1px solid transparent;
-    user-select: none !important;
+  outline: none !important;
+  border: 1px solid transparent;
+  user-select: none !important;
+  color: #ddd !important;
 }
 
 .form-control:focus {
-    outline: none !important;
-    outline-color: transparent !important;
+  outline: none !important;
+  outline-color: transparent !important;
+  color: #ddd !important;
 }
-
 .my-submit {
-    background-color: var(--myred) !important;
+  background-color: var(--myred) !important;
 }
 
 .fancy-header {
-    background-color: transparent;
-    font-family: 'Monoton', cursive;
-    color: var(--myred);
-    border: none;
-    user-select: none !important;
+  background-color: transparent;
+  color: var(--myred);
+  border: none;
+  user-select: none !important;
 }
 
 .message-box {
-    background-color: var(--msg);
-    opacity: 0.8;
-    padding: 5px;
-    border-radius: 10px;
-    width: 100%;
-    margin-bottom: 5px;
-    width: 35%;
-    border-bottom-right-radius: 30px;
+  background-color: var(--msg);
+  opacity: 0.8;
+  padding: 5px;
+  border-radius: 10px;
+  width: 100%;
+  margin-bottom: 5px;
+  width: 35%;
+  border-bottom-right-radius: 30px;
 }
 
 .my-message-box {
-    text-align: right;
-    margin-left: 65%;
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 30px;
+  text-align: right;
+  margin-left: 65%;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 30px;
 }
 
 .chat-header {
-    background-color: #333; 
-    box-shadow: 0 4px 2px -2px #0000009c;
-    padding-left: 10px;
-    font-size: 25px;
-    margin-bottom: 20px;
+  background-color: #333;
+  box-shadow: 0 4px 2px -2px #0000009c;
+  padding-left: 10px;
+  font-size: 25px;
+  margin-bottom: 20px;
 }
 
 .group-btn {
-    font-size: 3vh;
+  font-size: 3vh;
 }
 
-.group-btn:hover {
-    color: var(--msg);
+.group-btn:hover, .chat-exit:hover {
+  color: var(--msg);
 }
 
 .swal2-confirm {
-    background-color: var(--myred) !important;
+  background-color: var(--myred) !important;
+}
+
+#swal2-title {
+  color: var(--msg) !important;
 }
 
 .hoverable:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .active-box {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
-.disabled, .disabled * {
-    color: grey !important;
-    pointer-events: none !important;
+.disabled,
+.disabled * {
+  color: grey !important;
+  pointer-events: none !important;
+}
+
+.html5tooltip-box {
+  background-color: #181818;
+  padding: 5px;
+  color: var(--msg);
 }

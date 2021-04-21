@@ -4,7 +4,6 @@ const { ipcRenderer } = require('electron');
 app.service('$drag', function () {
     this.for = function (elmnt) {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-        elmnt.style.zIndex = 15;
         if (document.getElementById(elmnt.id + "-header")) {
             document.getElementById(elmnt.id + "-header").onmousedown = dragMouseDown;
         } else elmnt.onmousedown = dragMouseDown;
@@ -14,7 +13,7 @@ app.service('$drag', function () {
             for (var i = 0; i < containers.length; i++) containers.item(i).style.zIndex = 0;
             e = e || window.event;
             e.preventDefault();
-            e.target.parentElement.style.zIndex = 10;
+            e.target.parentElement.style.zIndex = 5;
             pos3 = e.clientX;
             pos4 = e.clientY;
             document.onmouseup = closeDragElement;
@@ -66,7 +65,7 @@ app.service('$notification', function () {
         normal: {
             position: 'top-end',
             showConfirmButton: false,
-            timer: 1500
+            timer: 2000
         },
         form: {
             input: 'text',

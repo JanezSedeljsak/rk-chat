@@ -1,6 +1,7 @@
 const app = angular.module("rkchat", []);
 const net = require('net');
 const moment = require('moment');
+const html5tooltips = require('html5tooltipsjs');
 const tcpSocketConfig = [3333, '127.0.0.1'];
 
 app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notification) => {
@@ -35,12 +36,13 @@ app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notifi
         $scope.username = null;
         $scope.message = "";
         $scope.groups = { public: [] };  
+        html5tooltips.refresh();
     };
 
     $scope.initData();
-
     $scope.exit = () => $appWindow.exit();
     $scope.minimize = () => $appWindow.minimize();
+    $scope.closeChat = (group) => delete $scope.groups[group]; 
     $scope.logout = () => {
         tcpSocket.destroy();
         $scope.initData();
@@ -53,7 +55,7 @@ app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notifi
                 $scope.username = $parser.capFirstLetter(input.value);
                 $scope.userOnline = true;
                 $scope.$apply();
-                $notification.show('normal', { icon: 'success', title: `You have just logged in as ${$scope.username}` }, () => {
+                $notification.show('normal', { icon: 'success', title: `You have just logged in as ${$scope.username}`, timer: 1000 }, () => {
                     tcpSocket.connect(...tcpSocketConfig, () =>
                         $parser.sendData(tcpSocket, { "init_user": true, "username": $scope.username }));
                     $drag.for(document.getElementById("public-continer"));
