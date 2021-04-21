@@ -1,6 +1,6 @@
 const app = angular.module("rkchat", []);
 const net = require('net');
-const { parse } = require('path');
+const moment = require('moment');
 
 app.controller("rkchat_controller", ($scope, $parser, $drag) => {
     var client = new net.Socket();
@@ -84,7 +84,6 @@ app.controller("rkchat_controller", ($scope, $parser, $drag) => {
                     text: 'You need to have atleast 4 characters in your name!',
                 });
             }
-
         });
     }
 
@@ -119,11 +118,10 @@ app.controller("rkchat_controller", ($scope, $parser, $drag) => {
 
     $scope.sendMessage = (group) => {
         const messageVal = document.getElementById(`${group}-message`).value;
-        const currentDate = new Date();
         if (!messageVal) return; // if no message don't send
         let data = {
             message: messageVal,
-            timestamp: `${currentDate.getHours()}:${currentDate.getMinutes()}`,
+            timestamp: moment().format('HH:mm'),
             username: $scope.username,
         }
 

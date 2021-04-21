@@ -30,13 +30,13 @@
         </div>
     </nav>
 
-    <div id="{{ group }}-continer" class="card bg-dark chat-continaner" ng-if="userOnline"
+    <div id="{{ group }}-continer" class="card bg-dark chat-container" ng-if="userOnline"
         ng-repeat="(group, data) in groups track by $index">
         <div id="{{ group }}-continer-header" class="chat-header">
             <span class="fancy-header">{{ group }}</span>
         </div>
         <div style="height: 50vh; overflow-y: scroll;">
-            <div class="message-box" ng-repeat="message in groups[group]"
+            <div class="message-box" ng-repeat="message in groups[group] | orderBy:'timestamp'"
                 ng-class="{'my-message-box': message.username == '_'}">
                 <span>{{ message.message }}</span>
                 <hr />
