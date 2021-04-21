@@ -31,3 +31,11 @@ function dragElement(elmnt) {
         document.onmousemove = null;
     }
 }
+
+document.addEventListener('click', function (event) {
+    console.log("click", event);
+	if (!event.target.matches('.chat-continaner')) return;
+
+	event.preventDefault();
+	console.log(event.target);
+}, false);

@@ -1,6 +1,5 @@
 import signal
 import socket
-import struct
 import threading
 import json
 from myUtil import RKChatHelpers, PORT

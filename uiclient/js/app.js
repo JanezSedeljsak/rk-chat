@@ -1,19 +1,16 @@
 const app = angular.module("rkchat", []);
 const net = require('net');
 
-function capFirstLetter(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
-
 app.controller("rkchat_controller", $scope => {
     var client = new net.Socket();
-    client.connect(4444, '127.0.0.1', function() {
-        console.log('Connected');
-        client.write('Hello, server! Love, Client.');
-    });
-
     client.on('data', function(data) {
-        console.log('Received: ' + data);
+        debugger;
+        const parsedData = RKClientHelpers.decodeData(data);
+        // if public message
+        if (!('reciver' in parsedData)) {
+            $scope.groups['public'].push(parsedData);
+            $scope.$apply();
+        }
     });
 
     $scope.userOnline = false;
@@ -34,7 +31,7 @@ app.controller("rkchat_controller", $scope => {
             confirmButtonText: 'Enter chat',
         }).then((input) => {
             if (input.value.length > 3) {
-                $scope.username = capFirstLetter(input.value);
+                $scope.username = RKClientHelpers.capFirstLetter(input.value);
                 $scope.userOnline = true;
                 $scope.$apply();
                 Swal.fire({
@@ -44,6 +41,9 @@ app.controller("rkchat_controller", $scope => {
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {
+                    client.connect(3333, '127.0.0.1', () => {
+                        RKClientHelpers.sendData(client, { "init_user": true, "username": $scope.username });
+                    });
                     dragElement(document.getElementById("public-continer"));
                 });
             } else {
@@ -67,7 +67,7 @@ app.controller("rkchat_controller", $scope => {
             showCancelButton: true,
             confirmButtonText: 'Add user to groups',
         }).then((input) => {
-            const groupName = capFirstLetter(input.value);
+            const groupName = RKClientHelpers.capFirstLetter(input.value);
             $scope.groups[groupName] = [];
             $scope.$apply();
             dragElement(document.getElementById(`${groupName}-continer`));
