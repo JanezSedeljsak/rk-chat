@@ -1,5 +1,6 @@
 const app = angular.module("rkchat", []);
 const net = require('net');
+const { parse } = require('path');
 
 app.controller("rkchat_controller", ($scope, $parser, $drag) => {
     var client = new net.Socket();
@@ -7,8 +8,38 @@ app.controller("rkchat_controller", ($scope, $parser, $drag) => {
         const parsedData = $parser.decodeData(data);
 
         // if public message
-        if (!('reciver' in parsedData)) {
+        if ('no_user' in parsedData) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: "The user you are trying to reach currently isn't online!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } else if ('init_user' in parsedData) {
+            Swal.fire({
+                title: `${parsedData['username']} just joined!`,
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } else if ('user_left' in parsedData) {
+            Swal.fire({
+                title: `${parsedData['username']} just left!`,
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } else if (!('reciver' in parsedData)) {
             $scope.groups['public'].push(parsedData);
+            $scope.$apply();
+        } else if ($parser.capFirstLetter(parsedData['reciver']) == $scope.username) {
+            // if chat window doesn't exist yet create it...
+            const groupName = $parser.capFirstLetter(parsedData['username']);
+            if (!(parsedData['username'] in $scope.groups)) {
+                $scope.groups[groupName] = [];
+                $scope.$apply();
+                $drag.for(document.getElementById(`${groupName}-continer`));
+            }
+            $scope.groups[groupName].push(parsedData);
             $scope.$apply();
         }
     });
@@ -44,7 +75,7 @@ app.controller("rkchat_controller", ($scope, $parser, $drag) => {
                     client.connect(3333, '127.0.0.1', () => {
                         $parser.sendData(client, { "init_user": true, "username": $scope.username });
                     });
-                    $drag.dragElement(document.getElementById("public-continer"));
+                    $drag.for(document.getElementById("public-continer"));
                 });
             } else {
                 Swal.fire({
@@ -70,7 +101,7 @@ app.controller("rkchat_controller", ($scope, $parser, $drag) => {
             const groupName = $parser.capFirstLetter(input.value);
             $scope.groups[groupName] = [];
             $scope.$apply();
-            $drag.dragElement(document.getElementById(`${groupName}-continer`));
+            $drag.for(document.getElementById(`${groupName}-continer`));
         });
     }
 
@@ -96,10 +127,8 @@ app.controller("rkchat_controller", ($scope, $parser, $drag) => {
             username: $scope.username,
         }
 
-        if ($scope.currentGroup != 'public') {
-            data['reciver'] = $scope.currentGroup;
-        }
-
+        if (group != 'public') data['reciver'] = group;
+        $parser.sendData(client, data);
         $scope.groups[group].push({ ...data, username: '_' });
         document.getElementById(`${group}-message`).value = ""; // reset input
     }

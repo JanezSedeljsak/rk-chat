@@ -1,7 +1,7 @@
 const pystruct = require('python-struct');
 
 app.service('$drag', function () {
-    this.dragElement = function(elmnt) {
+    this.for = function(elmnt) {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
         if (document.getElementById(elmnt.id + "-header")) {
             document.getElementById(elmnt.id + "-header").onmousedown = dragMouseDown;
