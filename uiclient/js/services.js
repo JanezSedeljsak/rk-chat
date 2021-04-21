@@ -1,4 +1,5 @@
 const pystruct = require('python-struct');
+const { ipcRenderer } = require('electron');
 
 app.service('$drag', function () {
     this.for = function (elmnt) {
@@ -10,13 +11,10 @@ app.service('$drag', function () {
 
         function dragMouseDown(e) {
             var containers = document.getElementsByClassName("chat-container");
-            for (var i = 0; i < containers.length; i++) {
-                containers.item(i).style.zIndex = 0;
-            }
-
-            e.target.parentElement.style.zIndex = 10;
+            for (var i = 0; i < containers.length; i++) containers.item(i).style.zIndex = 0;
             e = e || window.event;
             e.preventDefault();
+            e.target.parentElement.style.zIndex = 10;
             pos3 = e.clientX;
             pos4 = e.clientY;
             document.onmouseup = closeDragElement;
@@ -56,4 +54,29 @@ app.service('$parser', function () {
         const dec = enc.decode(byteArr);
         return JSON.parse(dec.substr(dec.length - len));
     };
-})
+});
+
+app.service('$appWindow', function ($window) {
+    this.exit = () => $window.close();
+    this.minimize = () => ipcRenderer.send('request-minimize');
+});
+
+app.service('$notification', function () {
+    this.defaultSettingsByType = {
+        normal: {
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1500
+        },
+        form: {
+            input: 'text',
+            inputAttributes: { autocapitalize: 'off' },
+            showCancelButton: true
+        }
+    };
+
+    this.show = function(type, settings, callback=() => {}) {
+        const def = type in this.defaultSettingsByType ? this.defaultSettingsByType[type] : {};
+        Swal.fire({ ...def, ...settings }).then(callback);
+    }
+});

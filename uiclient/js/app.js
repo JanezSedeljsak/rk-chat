@@ -1,33 +1,19 @@
 const app = angular.module("rkchat", []);
 const net = require('net');
 const moment = require('moment');
+const tcpSocketConfig = [3333, '127.0.0.1'];
 
-app.controller("rkchat_controller", ($scope, $parser, $drag) => {
-    var client = new net.Socket();
-    client.on('data', function(data) {
+app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notification) => {
+    const tcpSocket = new net.Socket();
+    tcpSocket.on('data', function (data) {
         const parsedData = $parser.decodeData(data);
-
         // if public message
         if ('no_user' in parsedData) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: "The user you are trying to reach currently isn't online!",
-                showConfirmButton: false,
-                timer: 1500
-            });
+            $notification.show('normal', { icon: 'error', title: 'Oops...', text: "The user you are trying to reach currently isn't online!" })
         } else if ('init_user' in parsedData) {
-            Swal.fire({
-                title: `${parsedData['username']} just joined!`,
-                showConfirmButton: false,
-                timer: 1500
-            });
+            $notification.show('normal', { title: `${parsedData['username']} just joined!` });
         } else if ('user_left' in parsedData) {
-            Swal.fire({
-                title: `${parsedData['username']} just left!`,
-                showConfirmButton: false,
-                timer: 1500
-            });
+            $notification.show('normal', { title: `${parsedData['username']} just left!` });
         } else if (!('reciver' in parsedData)) {
             $scope.groups['public'].push(parsedData);
             $scope.$apply();
@@ -44,80 +30,50 @@ app.controller("rkchat_controller", ($scope, $parser, $drag) => {
         }
     });
 
-    $scope.userOnline = false;
-    $scope.username = null;
-    $scope.message = "";
-    $scope.groups = {
-        'public': []
-    }
+    $scope.initData = () => {
+        $scope.userOnline = false;
+        $scope.username = null;
+        $scope.message = "";
+        $scope.groups = { public: [] };  
+    };
+
+    $scope.initData();
+
+    $scope.exit = () => $appWindow.exit();
+    $scope.minimize = () => $appWindow.minimize();
+    $scope.logout = () => {
+        tcpSocket.destroy();
+        $scope.initData();
+        $notification.show('normal', { icon: 'success', title: `You have just logged out` });
+    };
 
     $scope.enterChat = () => {
-        Swal.fire({
-            title: 'Enter your username',
-            input: 'text',
-            inputAttributes: {
-                autocapitalize: 'off'
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Enter chat',
-        }).then((input) => {
+        $notification.show('form', { title: 'Enter your username', confirmButtonText: 'Enter chat' }, (input) => {
             if (input.value.length > 3) {
                 $scope.username = $parser.capFirstLetter(input.value);
                 $scope.userOnline = true;
                 $scope.$apply();
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'success',
-                    title: `You have just logged in as ${$scope.username}`,
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(() => {
-                    client.connect(3333, '127.0.0.1', () => {
-                        $parser.sendData(client, { "init_user": true, "username": $scope.username });
-                    });
+                $notification.show('normal', { icon: 'success', title: `You have just logged in as ${$scope.username}` }, () => {
+                    tcpSocket.connect(...tcpSocketConfig, () =>
+                        $parser.sendData(tcpSocket, { "init_user": true, "username": $scope.username }));
                     $drag.for(document.getElementById("public-continer"));
                 });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'You need to have atleast 4 characters in your name!',
-                });
-            }
+            } else $notification.show('normal', { icon: 'error', title: 'Oops...', text: 'You need to have atleast 4 characters in your name!' });
         });
-    }
+    };
 
     $scope.addGroup = () => {
-        Swal.fire({
-            title: 'Enter reciver name',
-            input: 'text',
-            inputAttributes: {
-                autocapitalize: 'off'
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Add user to groups',
-        }).then((input) => {
+        $notification.show('form', { title: 'Enter reciver name', confirmButtonText: 'Add user to groups' }, (input) => {
             const groupName = $parser.capFirstLetter(input.value);
             $scope.groups[groupName] = [];
             $scope.$apply();
             $drag.for(document.getElementById(`${groupName}-continer`));
         });
-    }
-
-    $scope.logout = () => {
-        $scope.userOnline = false;
-        $scope.username = "";
-        Swal.fire({
-            position: 'top-end',
-            icon: 'success',
-            title: `You have just logged out`,
-            showConfirmButton: false,
-            timer: 1500
-        });
-    }
+    };
 
     $scope.sendMessage = (group) => {
-        const messageVal = document.getElementById(`${group}-message`).value;
+        const messageContainer = document.getElementById(`${group}-message`);
+        const messageVal = messageContainer.value;
         if (!messageVal) return; // if no message don't send
         let data = {
             message: messageVal,
@@ -126,9 +82,8 @@ app.controller("rkchat_controller", ($scope, $parser, $drag) => {
         }
 
         if (group != 'public') data['reciver'] = group;
-        $parser.sendData(client, data);
+        $parser.sendData(tcpSocket, data);
         $scope.groups[group].push({ ...data, username: '_' });
-        document.getElementById(`${group}-message`).value = ""; // reset input
-    }
-
+        messageContainer.value = ""; // reset input
+    };
 });

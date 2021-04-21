@@ -19,11 +19,25 @@
 </head>
 
 <body ng-app="rkchat" ng-controller="rkchat_controller">
+    <div id="drag"></div>
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
             <form class="d-flex input-group w-auto">
+                <button class="fancy-header group-btn" ng-click="exit()">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+                <button class="fancy-header group-btn" ng-click="minimize()">
+                    <i class="fas fa-minus-circle"></i>
+                </button>
+                <button 
+                    class="fancy-header group-btn"
+                    ng-class="{'disabled': userOnline == false }"
+                    ng-click="logout()" 
+                    ng-disabled="!userOnline">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
                 <button class="fancy-header group-btn" ng-click="!userOnline ? enterChat() : addGroup()">
-                    <i class="fas fa-plus-circle"></i>
+                    <i class="{{ userOnline ? 'fas fa-plus-circle': 'fas fa-key' }}"></i>
                 </button>
                 <span style="font-size: 25px; margin-right: 10px" class="fancy-header">RK - Chat</span>
             </form>

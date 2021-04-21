@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 
 require('electron-debug')({
     showDevTools: process.env.NODE_ENV === 'development'
@@ -6,9 +6,10 @@ require('electron-debug')({
 
 function createWindow() {
     let win = new BrowserWindow({
-        width: 1280,
+        width: 1024,
         height: 720,
         resizable: false,
+        frame: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
@@ -16,7 +17,9 @@ function createWindow() {
     });
 
     win.setMenu(null);
-    win.loadFile('./index.html')
+    win.loadFile('./index.html');
+    ipcMain.on('request-minimize', () => win.minimize());
 }
 
-app.on('ready', createWindow)
+
+app.on('ready', createWindow);

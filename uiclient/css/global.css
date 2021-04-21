@@ -7,6 +7,17 @@
 
 body, html {
     height: 100%;
+    overflow: hidden;
+}
+
+#drag {
+    position: absolute;
+    -webkit-app-region: drag;
+    top: 0;
+    left: 15vw;
+    height: 50px;
+    width: 85vw;
+    display: inline-block;
 }
 
 body {
@@ -14,7 +25,7 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-position: center center;
+    background-position: right center;
 }
 
 main {
@@ -53,6 +64,7 @@ hr {
 
 nav {
     height: 50px !important;
+    box-shadow: 0 10px 20px 0 #0c0c0cb9;
 }
 
 .card,
@@ -88,6 +100,7 @@ nav {
     font-family: 'Monoton', cursive;
     color: var(--myred);
     border: none;
+    user-select: none !important;
 }
 
 .message-box {
@@ -134,4 +147,9 @@ nav {
 
 .active-box {
     text-decoration: underline;
+}
+
+.disabled, .disabled * {
+    color: grey !important;
+    pointer-events: none !important;
 }
