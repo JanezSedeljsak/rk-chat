@@ -1,11 +1,11 @@
 const app = angular.module("rkchat", []);
 const net = require('net');
 
-app.controller("rkchat_controller", $scope => {
+app.controller("rkchat_controller", ($scope, $parser, $drag) => {
     var client = new net.Socket();
     client.on('data', function(data) {
-        debugger;
-        const parsedData = RKClientHelpers.decodeData(data);
+        const parsedData = $parser.decodeData(data);
+
         // if public message
         if (!('reciver' in parsedData)) {
             $scope.groups['public'].push(parsedData);
@@ -31,7 +31,7 @@ app.controller("rkchat_controller", $scope => {
             confirmButtonText: 'Enter chat',
         }).then((input) => {
             if (input.value.length > 3) {
-                $scope.username = RKClientHelpers.capFirstLetter(input.value);
+                $scope.username = $parser.capFirstLetter(input.value);
                 $scope.userOnline = true;
                 $scope.$apply();
                 Swal.fire({
@@ -42,9 +42,9 @@ app.controller("rkchat_controller", $scope => {
                     timer: 1500
                 }).then(() => {
                     client.connect(3333, '127.0.0.1', () => {
-                        RKClientHelpers.sendData(client, { "init_user": true, "username": $scope.username });
+                        $parser.sendData(client, { "init_user": true, "username": $scope.username });
                     });
-                    dragElement(document.getElementById("public-continer"));
+                    $drag.dragElement(document.getElementById("public-continer"));
                 });
             } else {
                 Swal.fire({
@@ -67,10 +67,10 @@ app.controller("rkchat_controller", $scope => {
             showCancelButton: true,
             confirmButtonText: 'Add user to groups',
         }).then((input) => {
-            const groupName = RKClientHelpers.capFirstLetter(input.value);
+            const groupName = $parser.capFirstLetter(input.value);
             $scope.groups[groupName] = [];
             $scope.$apply();
-            dragElement(document.getElementById(`${groupName}-continer`));
+            $drag.dragElement(document.getElementById(`${groupName}-continer`));
         });
     }
 
