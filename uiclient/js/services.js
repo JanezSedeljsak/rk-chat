@@ -42,7 +42,7 @@ app.service('$parser', function () {
     this.capFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
     this.sendData = (socketClient, object) => {
-        const jsonString = JSON.stringify(object);
+        let jsonString = JSON.stringify(object);
         // tmp fix remove non utf-8 characters
         jsonString = jsonString.replace(/[^\x20-\x7E]/g, '');
 
