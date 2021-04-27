@@ -8,6 +8,22 @@ If you are using the terminal client this is the way to send messages:
 * Public message: ```$ message-content```
 * Private message: ```$ receiver >>> message-content```
 
+### Functionality
+* Client enters chat with a unique username
+* Sending private/public messages
+* Alerts for "user joined" and "user left"
+* Error message when trying to send a private message to somone who isn't online
+
+#### Message structure example
+```json
+{
+    "message": "This is a message example",
+    "timestamp": "12:10",
+    "username": "John Doe",
+    "reciver": "Lorem Ipsum"
+}
+```
+
 ### GUI Client
 
 ![banner-img](https://raw.githubusercontent.com/JanezSedeljsak/tcp-socket-demo/main/docs/client-chat.png)
