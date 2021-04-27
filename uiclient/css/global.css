@@ -124,6 +124,7 @@ nav {
   margin-bottom: 5px;
   width: 35%;
   border-bottom-right-radius: 30px;
+  color: #333 !important;
 }
 
 .my-message-box {

@@ -41,7 +41,7 @@
                     ng-click="!userOnline ? enterChat() : null" ng-show="!userOnline">
                     <i class="fas fa-key"></i>
                 </button>
-                <span style="font-size: 25px; margin-left: 10px" class="fancy-header">RK-Chat</span>
+                <span style="font-size: 25px; margin-left: 10px" class="fancy-header">RK-Chat {{ userOnline ? "- " + username : '' }}</span>
             </form>
         </div>
     </nav>
