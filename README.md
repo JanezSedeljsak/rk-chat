@@ -10,21 +10,21 @@ If you are using the terminal client this is the way to send messages:
 
 ### GUI Client
 
-![banner-img](https://github.com/JanezSedeljsak/tcp-socket-demo/blob/client-chat.png)
+![banner-img](https://raw.githubusercontent.com/JanezSedeljsak/tcp-socket-demo/main/docs/client-chat.png)
 
 ### App structure
 ```
-tcp-socket-demo
-└──  chatServer.py (main tcp-socket server)
-└──  chatClient.py (terminal client)
-└──  myUtil.py (global helpers for python)
-└──  uiclient (electron based GUI client)
-    └──  main.js (electron entry point)
-    └──  index.html 
-    └──  js
-        └──  app.js (main logic for client)
-        └──  services.js (helpers methods for angular)
-    └──  css (additional styling)
+└──tcp-socket-demo
+    └──  chatServer.py (main tcp-socket server)
+    └──  chatClient.py (terminal client)
+    └──  myUtil.py (global helpers for python)
+    └──  uiclient (electron based GUI client)
+        └──  main.js (electron entry point)
+        └──  index.html 
+        └──  js
+            └──  app.js (main logic for client)
+            └──  services.js (helpers methods for angular)
+        └──  css (additional styling)
 ```
 
 ### License
