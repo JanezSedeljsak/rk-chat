@@ -39,7 +39,7 @@ app.service('$drag', function () {
 });
 
 app.service('$parser', function () {
-    this.capFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    this.capFirstLetter = str => str.split(" ").map((word) => word[0].toUpperCase() + word.substring(1).toLowerCase()).join(" ");
 
     this.sendData = (socketClient, object) => {
         let jsonString = JSON.stringify(object);
