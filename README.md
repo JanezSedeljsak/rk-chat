@@ -30,7 +30,7 @@ If you are using the terminal client this is the way to send messages:
 
 ### App structure
 ```
-└──tcp-socket-demo
+└──  tcp-socket-demo
     └──  chatServer.py (main tcp-socket server)
     └──  chatClient.py (terminal client)
     └──  myUtil.py (global helpers for python)
