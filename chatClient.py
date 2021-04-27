@@ -11,7 +11,7 @@ def send_message(sock, message):
 
     if ">>>" in msg_send:
         data["message"] = msg_send[msg_send.index(">>>") + 3:].strip()
-        data["reciver"] = msg_send[:msg_send.rindex(">>>")].strip().capitalize()
+        data["receiver"] = msg_send[:msg_send.rindex(">>>")].strip().capitalize()
     else:
         data["message"] = msg_send
 
@@ -31,7 +31,7 @@ def message_receiver():
             elif 'user_left' in data:
                 RKChatHelpers.FormatMessage(data, userLeft=True, printMessage=True)
             # če je private sporočilo izpiše le če je zame
-            elif 'reciver' in data and data['reciver'] == me: 
+            elif 'receiver' in data and data['receiver'] == me: 
                 RKChatHelpers.FormatMessage(data, isPrivate=True, printMessage=True)
             else:
                 RKChatHelpers.FormatMessage(data, printMessage=True)

@@ -38,7 +38,7 @@ class RKChatHelpers:
     @staticmethod
     def _formatPrivateMessage(data):
         linesTmp = RKChatHelpers._formatNormalMessage(data)
-        linesTmp[0] = "[RKChat] Private Message - for '%s'" % data.get('reciver', '')
+        linesTmp[0] = "[RKChat] Private Message - for '%s'" % data.get('receiver', '')
         return linesTmp
 
     @staticmethod

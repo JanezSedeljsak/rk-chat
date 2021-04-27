@@ -15,10 +15,10 @@ app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notifi
             $notification.show('normal', { title: `${parsedData['username']} just joined!` });
         } else if ('user_left' in parsedData) {
             $notification.show('normal', { title: `${parsedData['username']} just left!` });
-        } else if (!('reciver' in parsedData)) {
+        } else if (!('receiver' in parsedData)) {
             $scope.groups['public'].push(parsedData);
             $scope.$apply();
-        } else if ($parser.capFirstLetter(parsedData['reciver']) == $scope.username) {
+        } else if ($parser.capFirstLetter(parsedData['receiver']) == $scope.username) {
             // if chat window doesn't exist yet create it...
             const groupName = $parser.capFirstLetter(parsedData['username']);
             if (!(parsedData['username'] in $scope.groups)) {
@@ -65,7 +65,7 @@ app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notifi
     };
 
     $scope.addGroup = () => {
-        $notification.show('form', { title: 'Enter reciver name', confirmButtonText: 'Add user to groups' }, (input) => {
+        $notification.show('form', { title: 'Enter receiver name', confirmButtonText: 'Add user to groups' }, (input) => {
             const groupName = $parser.capFirstLetter(input.value);
             $scope.groups[groupName] = [];
             $scope.$apply();
@@ -83,7 +83,7 @@ app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notifi
             username: $scope.username,
         }
 
-        if (group != 'public') data['reciver'] = group;
+        if (group != 'public') data['receiver'] = group;
         $parser.sendData(tcpSocket, data);
         $scope.groups[group].push({ ...data, username: '_' });
         messageContainer.value = ""; // reset input

@@ -20,7 +20,7 @@ If you are using the terminal client this is the way to send messages:
     "message": "This is a message example",
     "timestamp": "12:10",
     "username": "John Doe",
-    "reciver": "Lorem Ipsum"
+    "receiver": "Lorem Ipsum"
 }
 ```
 

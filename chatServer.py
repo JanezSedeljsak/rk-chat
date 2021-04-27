@@ -11,22 +11,22 @@ def client_thread(client_sock, client_addr):
     print("[system] we now have " + str(len(clients)) + " clients")
 
     try:
-        while True:  # neskoncna zanka
+        while True: 
             msg_received = RKChatHelpers.ReciveMessage(client_sock)
-            if not msg_received:  # ce obstaja sporocilo
+            if not msg_received:
                 break
 
             data = json.loads(msg_received)
             user_init_message, private_message = False, False
-            reciver_socket = None
+            receiver_socket = None
 
-            if data.get('reciver'):
+            if data.get('receiver'):
                 private_message = True
-                reciver_socket = next((key for key, val in clients.items() if val == data['reciver']), None) # get client socket by username
-                # if not user with 'reciver' in clients
-                if not reciver_socket:
+                receiver_socket = next((key for key, val in clients.items() if val == data['receiver']), None) # get client socket by username
+                # if not user with 'receiver' in clients
+                if not receiver_socket:
                     data_tmp = json.loads(msg_received)
-                    data = { 'no_user': True, 'username':  data['reciver'] }
+                    data = { 'no_user': True, 'username':  data['receiver'] }
                     RKChatHelpers.SendMessage(client_sock, data)
                     continue
 
@@ -34,13 +34,13 @@ def client_thread(client_sock, client_addr):
                 clients[client_sock] = data.get('username', '')
                 user_init_message = True
 
-            no_user = private_message and not reciver_socket
+            no_user = private_message and not receiver_socket
             RKChatHelpers.FormatMessage(data, isUserInit=user_init_message, 
                 noUser=no_user, isPrivate=private_message, printMessage=True) 
 
             if private_message:
-                reciver = data['reciver']
-                RKChatHelpers.SendMessage(reciver_socket, data)
+                receiver = data['receiver']
+                RKChatHelpers.SendMessage(receiver_socket, data)
             else:
                 for client in clients:
                     if client != client_sock:
