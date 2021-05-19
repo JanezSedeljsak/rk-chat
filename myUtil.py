@@ -2,10 +2,16 @@ from datetime import datetime
 import uuid
 import struct
 from json import dumps
+import ssl
+import os
 
 # config
+CERT_FILE_PATH = 'public_cert'
 PORT = 3333
 HEADER_LENGTH = 2
+SERVER_CERT = os.path.join(CERT_FILE_PATH, 'server_cert.crt')
+SERVER_KEYFILE = os.path.join(CERT_FILE_PATH, 'server_private.key')
+CLIENTS_PEM = os.path.join(CERT_FILE_PATH, 'clients.pem')
 
 class RKChatHelpers:
     
@@ -115,3 +121,21 @@ class RKChatHelpers:
     def SendUsernameToSocket(sock, username):
         data = { "init_user": True, "username": username }
         RKChatHelpers.SendMessage(sock, data)
+
+    @staticmethod
+    def GenerateSSLContext(crtFile="", keyFile="", isClientSide=True):
+        global CERT_FILE_PATH
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context.verify_mode = ssl.CERT_REQUIRED
+        if isClientSide:
+            certfile = os.path.join(CERT_FILE_PATH, crtFile)
+            keyfile = os.path.join(CERT_FILE_PATH, keyFile)
+
+            context.load_cert_chain(certfile=certfile, keyfile=keyfile)
+            context.load_verify_locations(SERVER_CERT)
+        else:
+            context.load_cert_chain(certfile=SERVER_CERT, keyfile=SERVER_KEYFILE)
+            context.load_verify_locations(CLIENTS_PEM)
+
+        context.set_ciphers('ECDHE-RSA-AES128-GCM-SHA256')
+        return context

@@ -48,6 +48,7 @@ def client_thread(client_sock, client_addr):
     except:
         pass
 
+
     with clients_lock:
         left_name = clients[client_sock]
         data = {'user_left': True, 'username': left_name }
@@ -63,21 +64,24 @@ def client_thread(client_sock, client_addr):
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-# kreiraj socket
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+ssl_context = RKChatHelpers.GenerateSSLContext(isClientSide=False)
+server_socket = ssl_context.wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
 server_socket.bind(("localhost", PORT))
 server_socket.listen(1)
 
-# cakaj na nove odjemalce
 print("[system] listening ...")
 clients = {}
 clients_lock = threading.Lock()
 while True:
     try:
-        # pocakaj na novo povezavo - blokirajoc klic
         client_sock, client_addr = server_socket.accept()
-        with clients_lock:
-            clients[client_sock] = "" # na začetku client nima uporabniškega imena (to naredimo z ločenim sporočilom)
+        cert = client_sock.getpeercert()
+
+        for sub in cert['subject']:
+            for key, value in sub:
+                if key == 'commonName': # (common name contains username)
+                    with clients_lock:
+                        clients[client_sock] = value
 
         thread = threading.Thread(target=client_thread, args=(client_sock, client_addr))
         thread.daemon = True

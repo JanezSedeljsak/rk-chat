@@ -37,21 +37,22 @@ def message_receiver():
                 RKChatHelpers.FormatMessage(data, printMessage=True)
 
 # vnesi uporabniško ime
-me = input("Vnesi uporabniško ime: ").capitalize()
+me = input("Ime: ")
+cert_data = "janez_cert.crt janez_private.key"#input("Vnesi ime certifikata in ime ključa: ")
 
-# povezi se na streznik
+# connect to the server
 print("[system] connecting to chat server ...")
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+ssl_context = RKChatHelpers.GenerateSSLContext(*cert_data.split(" "))
+sock = ssl_context.wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
 sock.connect(("localhost", PORT))
-RKChatHelpers.SendUsernameToSocket(sock, me)
+#RKChatHelpers.SendUsernameToSocket(sock, me) [when using SSL we get user identification from the cert "Common name"]
 print("[system] connected!")
 
-# zazeni message_receiver funkcijo v loceni niti
 thread = threading.Thread(target=message_receiver)
 thread.daemon = True
 thread.start()
 
-# pocakaj da uporabnik nekaj natipka in poslji na streznik
 print("""
 #----------------------------------------------#
 # Navodila za privat sporočila                 #
