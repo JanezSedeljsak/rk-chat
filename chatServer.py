@@ -35,6 +35,7 @@ def client_thread(client_sock, client_addr):
                 user_init_message = True
 
             no_user = private_message and not receiver_socket
+            data['username'] = clients[client_sock] # get username by his socket
             RKChatHelpers.FormatMessage(data, isUserInit=user_init_message, 
                 noUser=no_user, isPrivate=private_message, printMessage=True) 
 
@@ -82,6 +83,7 @@ while True:
                 if key == 'commonName': # (common name contains username)
                     with clients_lock:
                         clients[client_sock] = value
+                        print(value)
 
         thread = threading.Thread(target=client_thread, args=(client_sock, client_addr))
         thread.daemon = True

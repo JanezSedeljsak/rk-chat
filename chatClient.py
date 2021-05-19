@@ -6,8 +6,7 @@ from datetime import datetime
 from myUtil import RKChatHelpers, PORT
 
 def send_message(sock, message):
-    global me
-    data = { "username": me, "timestamp": datetime.now().strftime("%H:%M") }
+    data = { "timestamp": datetime.now().strftime("%H:%M") }
 
     if ">>>" in msg_send:
         data["message"] = msg_send[msg_send.index(">>>") + 3:].strip()
@@ -18,7 +17,6 @@ def send_message(sock, message):
     RKChatHelpers.SendMessage(sock, data)
 
 def message_receiver():
-    global me
     while True:
         msg_received = RKChatHelpers.ReciveMessage(sock)
         if msg_received:
@@ -30,14 +28,11 @@ def message_receiver():
                RKChatHelpers.FormatMessage(data, isUserInit=True, printMessage=True)
             elif 'user_left' in data:
                 RKChatHelpers.FormatMessage(data, userLeft=True, printMessage=True)
-            # če je private sporočilo izpiše le če je zame
-            elif 'receiver' in data and data['receiver'] == me: 
-                RKChatHelpers.FormatMessage(data, isPrivate=True, printMessage=True)
             else:
                 RKChatHelpers.FormatMessage(data, printMessage=True)
 
-# vnesi uporabniško ime
-me = input("Ime: ")
+# enter username
+#me = input("Ime: ")
 cert_data = "janez_cert.crt janez_private.key"#input("Vnesi ime certifikata in ime ključa: ")
 
 # connect to the server
