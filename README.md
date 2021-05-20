@@ -23,10 +23,6 @@ If you are using the terminal client this is the way to send messages:
 }
 ```
 
-### GUI Client
-
-![banner-img](https://raw.githubusercontent.com/JanezSedeljsak/tcp-socket-demo/main/docs/client-chat.png)
-
 ### App structure
 ```
 └──  tcp-socket-demo
