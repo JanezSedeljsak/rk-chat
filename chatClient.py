@@ -10,7 +10,7 @@ def send_message(sock, message):
 
     if ">>>" in msg_send:
         data["message"] = msg_send[msg_send.index(">>>") + 3:].strip()
-        data["receiver"] = msg_send[:msg_send.rindex(">>>")].strip().capitalize()
+        data["receiver"] = msg_send[:msg_send.rindex(">>>")].strip()
     else:
         data["message"] = msg_send
 
@@ -21,21 +21,19 @@ def message_receiver():
         msg_received = RKChatHelpers.ReciveMessage(sock)
         if msg_received:
             data = json.loads(msg_received)
-            # če sem poslal privat sporočilo in uporabnik ni prijavljen
             if 'no_user' in data:
                 RKChatHelpers.FormatMessage(data, noUser=True, printMessage=True)
             elif 'init_user' in data:
                RKChatHelpers.FormatMessage(data, isUserInit=True, printMessage=True)
             elif 'user_left' in data:
                 RKChatHelpers.FormatMessage(data, userLeft=True, printMessage=True)
+            elif 'receiver' in data:
+                RKChatHelpers.FormatMessage(data, isPrivate=True, printMessage=True)
             else:
                 RKChatHelpers.FormatMessage(data, printMessage=True)
 
-# enter username
-#me = input("Ime: ")
-cert_data = "janez_cert.crt janez_private.key"#input("Vnesi ime certifikata in ime ključa: ")
 
-# connect to the server
+cert_data = input("Vnesi datoteki - certfiikat in kljuc (ločena s presledkom): ")
 print("[system] connecting to chat server ...")
 
 ssl_context = RKChatHelpers.GenerateSSLContext(*cert_data.split(" "))
