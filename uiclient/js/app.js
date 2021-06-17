@@ -2,7 +2,25 @@ const app = angular.module("rkchat", []);
 const net = require('net');
 const moment = require('moment');
 const html5tooltips = require('html5tooltipsjs');
+const tls = require('tls');
+const fs = require('fs');
+
 const tcpSocketConfig = [3333, '127.0.0.1'];
+const crtFilesDirectory = './../public_cert/';
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0; // ignore unauthorized IPs if dev mode
+
+const connectWithTLS = (name, callback) => {
+    const connectionObj = {
+        host: tcpSocketConfig[1],
+        port: tcpSocketConfig[0],
+        cert: fs.readFileSync(`${crtFilesDirectory}${name}.crt`),
+        key: fs.readFileSync(`${crtFilesDirectory}${name}.key`),
+        ca: fs.readFileSync(`${crtFilesDirectory}server_cert.crt`),
+        secureProtocol: 'TLSv1_2_method'
+    };
+
+    tls.connect(connectionObj, callback);
+};
 
 app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notification) => {
     const tcpSocket = new net.Socket();
@@ -55,10 +73,12 @@ app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notifi
                 $scope.username = $parser.capFirstLetter(input.value);
                 $scope.userOnline = true;
                 $scope.$apply();
-                $notification.show('normal', { icon: 'success', title: `You have just logged in as ${$scope.username}`, timer: 1000 }, () => {
-                    tcpSocket.connect(...tcpSocketConfig, () =>
-                        $parser.sendData(tcpSocket, { "init_user": true, "username": $scope.username }));
-                    $drag.for(document.getElementById("public-continer"));
+                connectWithTLS(input.value, (res) => {
+                    console.log(res);
+                    $notification.show('normal', { icon: 'success', title: `You have just logged in as ${$scope.username}`, timer: 1000 }, () => {
+                        tcpSocket.connect(...tcpSocketConfig, console.log);
+                        $drag.for(document.getElementById("public-continer"));
+                    });
                 });
             } else $notification.show('normal', { icon: 'error', title: 'Oops...', text: 'You need to have atleast 4 characters in your name!' });
         });
