@@ -83,7 +83,13 @@ while True:
                 if key == 'commonName': # (common name contains username)
                     with clients_lock:
                         clients[client_sock] = value
-                        print(value)
+
+                        # send out user init message
+                        for client in clients:
+                            if client != client_sock:
+                                tmpData = { 'init_user': True, 'username': value }
+                                RKChatHelpers.SendMessage(client, tmpData)
+
 
         thread = threading.Thread(target=client_thread, args=(client_sock, client_addr))
         thread.daemon = True
