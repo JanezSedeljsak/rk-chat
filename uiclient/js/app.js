@@ -7,7 +7,7 @@ const fs = require('fs');
 const tcpSocketConfig = [3333, '127.0.0.1'];
 const crtFilesDirectory = './../public_cert/';
 
-const generateTlsOptions = name => ({
+const generateTlsOptions = name => fs.existsSync(`${crtFilesDirectory}${name}.crt`) ? ({
     host: tcpSocketConfig[1],
     port: tcpSocketConfig[0],
     cert: fs.readFileSync(`${crtFilesDirectory}${name}.crt`),
@@ -15,7 +15,7 @@ const generateTlsOptions = name => ({
     ca: fs.readFileSync(`${crtFilesDirectory}server_cert.crt`),
     secureProtocol: 'TLSv1_2_method',
     rejectUnauthorized: false
-});
+}) : false;
 
 let tcpSocketClient = null;
 
@@ -43,11 +43,17 @@ app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notifi
 
     $scope.enterChat = () => {
         $notification.show('form', { title: 'Enter your username', confirmButtonText: 'Enter chat' }, (input) => {
+            const tlsOptions = generateTlsOptions(input.value);
+            if (!tlsOptions) {
+                $notification.show('normal', { icon: 'error', title: `Certificate does not exist!`, timer: 1000 }, null);
+                return;
+            }
+            
             $scope.username = $parser.capFirstLetter(input.value);
             $scope.userOnline = true;
             $scope.$apply();
 
-            tcpSocketClient = tls.connect(generateTlsOptions(input.value), () => {
+            tcpSocketClient = tls.connect(tlsOptions, () => {
                 $notification.show('normal', { icon: 'success', title: `You have just logged in as ${$scope.username}`, timer: 1000 }, null);
             });
 
