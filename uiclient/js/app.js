@@ -1,5 +1,4 @@
 const app = angular.module("rkchat", []);
-const net = require('net');
 const moment = require('moment');
 const html5tooltips = require('html5tooltipsjs');
 const tls = require('tls');
@@ -7,47 +6,18 @@ const fs = require('fs');
 
 const tcpSocketConfig = [3333, '127.0.0.1'];
 const crtFilesDirectory = './../public_cert/';
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0; // ignore unauthorized IPs if dev mode
 
-const connectWithTLS = (name, callback) => {
-    const connectionObj = {
-        host: tcpSocketConfig[1],
-        port: tcpSocketConfig[0],
-        cert: fs.readFileSync(`${crtFilesDirectory}${name}.crt`),
-        key: fs.readFileSync(`${crtFilesDirectory}${name}.key`),
-        ca: fs.readFileSync(`${crtFilesDirectory}server_cert.crt`),
-        secureProtocol: 'TLSv1_2_method'
-    };
-
-    tls.connect(connectionObj, callback);
-};
+const generateTlsOptions = name => ({
+    host: tcpSocketConfig[1],
+    port: tcpSocketConfig[0],
+    cert: fs.readFileSync(`${crtFilesDirectory}${name}.crt`),
+    key: fs.readFileSync(`${crtFilesDirectory}${name}.key`),
+    ca: fs.readFileSync(`${crtFilesDirectory}server_cert.crt`),
+    secureProtocol: 'TLSv1_2_method',
+    rejectUnauthorized: false
+});
 
 app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notification) => {
-    const tcpSocket = new net.Socket();
-    tcpSocket.on('data', function (data) {
-        const parsedData = $parser.decodeData(data);
-        // if public message
-        if ('no_user' in parsedData) {
-            $notification.show('normal', { icon: 'error', title: 'Oops...', text: "The user you are trying to reach currently isn't online!" })
-        } else if ('init_user' in parsedData) {
-            $notification.show('normal', { title: `${parsedData['username']} just joined!` });
-        } else if ('user_left' in parsedData) {
-            $notification.show('normal', { title: `${parsedData['username']} just left!` });
-        } else if (!('receiver' in parsedData)) {
-            $scope.groups['public'].push(parsedData);
-            $scope.$apply();
-        } else if ($parser.capFirstLetter(parsedData['receiver']) == $scope.username) {
-            // if chat window doesn't exist yet create it...
-            const groupName = $parser.capFirstLetter(parsedData['username']);
-            if (!(parsedData['username'] in $scope.groups)) {
-                $scope.groups[groupName] = [];
-                $scope.$apply();
-                $drag.for(document.getElementById(`${groupName}-continer`));
-            }
-            $scope.groups[groupName].push(parsedData);
-            $scope.$apply();
-        }
-    });
 
     $scope.initData = () => {
         $scope.userOnline = false;
@@ -62,7 +32,6 @@ app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notifi
     $scope.minimize = () => $appWindow.minimize();
     $scope.closeChat = (group) => delete $scope.groups[group]; 
     $scope.logout = () => {
-        tcpSocket.destroy();
         $scope.initData();
         $notification.show('normal', { icon: 'success', title: `You have just logged out` });
     };
@@ -73,12 +42,27 @@ app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notifi
                 $scope.username = $parser.capFirstLetter(input.value);
                 $scope.userOnline = true;
                 $scope.$apply();
-                connectWithTLS(input.value, (res) => {
-                    console.log(res);
-                    $notification.show('normal', { icon: 'success', title: `You have just logged in as ${$scope.username}`, timer: 1000 }, () => {
-                        tcpSocket.connect(...tcpSocketConfig, console.log);
-                        $drag.for(document.getElementById("public-continer"));
-                    });
+                window.tlsSocket = tls.connect(generateTlsOptions(input.value), console.log);
+                window.tlsSocket.on('data', data => {
+                    const parsedData = $parser.decodeData(data);
+                    if ('no_user' in parsedData) {
+                        $notification.show('normal', { icon: 'error', title: 'Oops...', text: "The user you are trying to reach currently isn't online!" })
+                    } else if ('user_left' in parsedData) {
+                        $notification.show('normal', { title: `${parsedData['username']} just left!` });
+                    } else if (!('receiver' in parsedData)) {
+                        $scope.groups['public'].push(parsedData);
+                        $scope.$apply();
+                    } else if ($parser.capFirstLetter(parsedData['receiver']) == $scope.username) {
+                        // if chat window doesn't exist yet create it...
+                        const groupName = $parser.capFirstLetter(parsedData['username']);
+                        if (!(parsedData['username'] in $scope.groups)) {
+                            $scope.groups[groupName] = [];
+                            $scope.$apply();
+                            $drag.for(document.getElementById(`${groupName}-continer`));
+                        }
+                        $scope.groups[groupName].push(parsedData);
+                        $scope.$apply();
+                    }
                 });
             } else $notification.show('normal', { icon: 'error', title: 'Oops...', text: 'You need to have atleast 4 characters in your name!' });
         });
@@ -104,7 +88,7 @@ app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notifi
         }
 
         if (group != 'public') data['receiver'] = group;
-        $parser.sendData(tcpSocket, data);
+        $parser.sendData(window.tlsSocket, data);
         $scope.groups[group].push({ ...data, username: '_' });
         messageContainer.value = ""; // reset input
     };
