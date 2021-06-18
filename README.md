@@ -9,9 +9,9 @@ If you are using the terminal client this is the way to send messages:
 * Private message: ```$ receiver >>> message-content```
 
 ### Functionality
-* Client enters chat with a unique username
+* Client enters chat with a SSL certificate file (filename is required - available options are in the public_cert directory)
 * Sending private/public messages
-* Alerts for "user joined" and "user left"
+* Basic alerts and live messaging with reactive UI
 * Error message when trying to send a private message to somone who isn't online
 
 #### Message structure example
@@ -19,7 +19,6 @@ If you are using the terminal client this is the way to send messages:
 {
     "message": "This is a message example",
     "timestamp": "12:10",
-    "username": "John Doe",
     "receiver": "Lorem Ipsum"
 }
 ```
@@ -34,6 +33,8 @@ If you are using the terminal client this is the way to send messages:
     └──  chatServer.py (main tcp-socket server)
     └──  chatClient.py (terminal client)
     └──  myUtil.py (global helpers for python)
+    └──  public_cert (folder containing every certificate)
+        └──  ..... certificates [*.key, *.crt]
     └──  uiclient (electron based GUI client)
         └──  main.js (electron entry point)
         └──  index.html 
