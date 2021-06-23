@@ -1,9 +1,12 @@
+from OpenSSL import crypto, SSL
 from datetime import datetime
-import uuid
-import struct
-from json import dumps
+import json
 import ssl
 import os
+import re
+import sys
+import uuid
+import struct
 
 # config
 CERT_FILE_PATH = 'public_cert'
@@ -112,7 +115,7 @@ class RKChatHelpers:
 
     @staticmethod
     def SendMessage(sock, data):
-        encoded_data = bytes(dumps(data), encoding="utf-8")
+        encoded_data = bytes(json.dumps(data), encoding="utf-8")
         header = struct.pack("!H", len(encoded_data))
         message = header + encoded_data 
         sock.sendall(message)
@@ -139,3 +142,78 @@ class RKChatHelpers:
 
         context.set_ciphers('ECDHE-RSA-AES128-GCM-SHA256')
         return context
+
+
+class CertificateServices:
+    @staticmethod
+    def GenerateSignedCertificate(name, prefix=""):
+        global CLIENTS_PEM, CERT_FILE_PATH
+        success = True
+
+        try:
+            k = crypto.PKey()
+            k.generate_key(crypto.TYPE_RSA, 4096)
+            cert = crypto.X509()
+            cert.get_subject().CN = name.capitalize()
+            cert.set_issuer(cert.get_subject())
+            cert.set_pubkey(k)
+            cert.sign(k, 'sha512') 
+
+            with open(os.path.join(prefix, CERT_FILE_PATH, f'{name.lower()}.unconfirmed_crt'), "wt") as f:
+                f.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert).decode("utf-8"))
+
+            with open(os.path.join(prefix, CERT_FILE_PATH, f'{name.lower()}.key'), "wt") as f:
+                f.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, k).decode("utf-8"))
+        
+        except:
+            success = False
+
+        return success
+
+    
+    @staticmethod
+    def ConfirmNewCertificate(name, prefix=""):
+        global CLIENTS_PEM, CERT_FILE_PATH
+        certContent = None
+
+        # read unconfirmed file and then remove it
+        unconfirmedCert = os.path.join(prefix, CERT_FILE_PATH, f'{name.lower()}.unconfirmed_crt')
+        with open(unconfirmedCert, "r") as f:
+            certContent = f.read()
+        
+        os.remove(unconfirmedCert)
+
+        if not certContent:
+            return False
+            
+        # create the real crt file
+        with open(os.path.join(prefix, CERT_FILE_PATH, f'{name.lower()}.crt'), "wt") as f:
+            f.write(f'\n{certContent.strip()}')
+        
+        # add content to server verified users
+        with open(prefix, CLIENTS_PEM, 'a') as f:
+            f.write(certContent)
+        
+        return True
+
+    @staticmethod
+    def getNewRequestedCertFiles(prefix=""):
+        global CLIENTS_PEM, CERT_FILE_PATH
+        return [f for f in os.listdir(os.path.join(prefix, CERT_FILE_PATH)) if re.match("[A-Za-z0-9]+\.unconfirmed_crt", f)]
+    
+
+if __name__ == "__main__":
+    result = { "args": sys.argv[1:] }
+    action = sys.argv[1]
+    prefix = sys.argv[-1] # last arg sent is the path prefix (depends on where we run the script from)
+    
+    if action == 'generate-certificate':
+        result['success'] = sys.argv[2] and CertificateServices.GenerateSignedCertificate(sys.argv[2], prefix=prefix)
+
+    elif action == 'get-requested-certificates':
+        result['certificates'] = CertificateServices.getNewRequestedCertFiles(prefix=prefix) or []
+
+    elif action == 'confirm-certificate':
+        result['success'] = sys.argv[2] and CertificateServices.ConfirmNewCertificate(sys.argv[2], prefix=prefix)
+
+    print(json.dumps(result))
