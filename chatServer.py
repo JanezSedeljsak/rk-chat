@@ -8,7 +8,7 @@ admin = None
 clients = {}
 
 def client_thread(client_sock, client_addr):
-    global clients, admin
+    global clients, admin, ssl_context
 
     print("[system] connected with " + client_addr[0] + ":" + str(client_addr[1]))
     print("[system] we now have " + str(len(clients)) + " clients")
@@ -22,6 +22,10 @@ def client_thread(client_sock, client_addr):
             data = json.loads(msg_received)
             user_init_message, private_message = False, False
             receiver_socket = None
+
+            if data.get('refresh_request'):
+                RKChatHelpers.ReloadPEMFile(ssl_context)
+                continue
 
             if data.get('receiver'):
                 private_message = True

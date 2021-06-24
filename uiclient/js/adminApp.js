@@ -2,6 +2,8 @@ const app = angular.module("adminApp", []);
 const html5tooltips = require('html5tooltipsjs');
 const tls = require('tls');
 
+let tcpSocketClient = null;
+
 app.controller("admin_controller", ($scope, $appWindow, $certService, $parser) => {
     $scope.exit = () => $appWindow.exit();
     $scope.minimize = () => $appWindow.minimize('admin');
@@ -10,6 +12,17 @@ app.controller("admin_controller", ($scope, $appWindow, $certService, $parser) =
     $scope.confirmCertificate = (certName) => {
         $certService.confirmCertificate(certName);
         $scope.initData();
+        $scope.sendRefreshRequestToSocket();
+    }
+
+    $scope.sendRefreshRequestToSocket = () => {
+        if (!tcpSocketClient) {
+            $notification.show('normal', { icon: 'error', title: `Error occured - connection to socket is not established`, timer: 1000 }, null);
+            return;
+        }
+
+        const params = { refresh_request: true };
+        $parser.sendData(tcpSocketClient, params);
     }
 
     tcpSocketClient = tls.connect($certService.getUserCertificate('admin', true), () => {});

@@ -147,6 +147,12 @@ class RKChatHelpers:
         context.set_ciphers('ECDHE-RSA-AES128-GCM-SHA256')
         return context
 
+    @staticmethod
+    def ReloadPEMFile(ctx):
+        global CERT_FILE_PATH
+        ctx.load_verify_locations(CLIENTS_PEM)
+
+
 
 class CertificateServices:
     @staticmethod
