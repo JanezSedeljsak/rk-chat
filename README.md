@@ -13,6 +13,8 @@ If you are using the terminal client this is the way to send messages:
 * Sending private/public messages
 * Basic alerts and live messaging with reactive UI
 * Error message when trying to send a private message to somone who isn't online
+* Admin dashboard: viewing who is currently online and manually confirming ssl certificates
+* Users can register with their username (app will generate unverified certificate)
 
 #### Message structure example
 ```json
@@ -25,7 +27,8 @@ If you are using the terminal client this is the way to send messages:
 
 ### GUI Client
 
-![banner-img](https://raw.githubusercontent.com/JanezSedeljsak/tcp-socket-demo/main/docs/client-chat.png)
+> Chat: ![banner-img](https://raw.githubusercontent.com/JanezSedeljsak/tcp-socket-demo/main/docs/client-chat.png)
+> Admin app: ![banner-img](https://raw.githubusercontent.com/JanezSedeljsak/tcp-socket-demo/main/docs/admin-app.png)
 
 ### App structure
 ```
@@ -37,9 +40,11 @@ If you are using the terminal client this is the way to send messages:
         └──  ..... certificates [*.key, *.crt]
     └──  uiclient (electron based GUI client)
         └──  main.js (electron entry point)
+        └──  admin.html (admin template)
         └──  index.html 
         └──  js
             └──  app.js (main logic for client)
+            └──  adminApp.js (main logic for adminApp)
             └──  services.js (helpers methods for angular)
         └──  css (additional styling)
 ```
