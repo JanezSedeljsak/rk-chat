@@ -45,7 +45,7 @@ ipcMain.on('draw-admin', () => {
 ipcMain.on('request-minimize', () => win.minimize());
 ipcMain.on('request-minimize-admin', () => adminWin.minimize());
 
-ipcMain.on('generate-certificate', (event, data) => {
+ipcMain.on('generate-certificate', (_, data) => {
     certificateService('generate-certificate', result => {
         console.log(result);
     }, [data['certName']], BASE_PATH);
@@ -54,11 +54,11 @@ ipcMain.on('generate-certificate', (event, data) => {
 ipcMain.on('get-requested-certificates', () => {
     certificateService('get-requested-certificates', result => {
         console.log(result);
-    });
+    }, [], BASE_PATH);
 });
 
-ipcMain.on('confirm-certificate', () => {
+ipcMain.on('confirm-certificate', (_ , data) => {
     certificateService('confirm-certificate', result => {
         console.log(result);
-    });
+    }, [data["certName"]], BASE_PATH);
 });

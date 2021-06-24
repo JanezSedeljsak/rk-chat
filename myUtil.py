@@ -199,13 +199,17 @@ class CertificateServices:
     @staticmethod
     def getNewRequestedCertFiles(prefix=""):
         global CLIENTS_PEM, CERT_FILE_PATH
-        return [f for f in os.listdir(os.path.join(prefix, CERT_FILE_PATH)) if re.match("[A-Za-z0-9]+\.unconfirmed_crt", f)]
+        return [
+            f[:f.index('.unconfirmed_crt')] 
+            for f in os.listdir(os.path.join(prefix, CERT_FILE_PATH)) 
+            if re.match("[A-Za-z0-9]+\.unconfirmed_crt", f)
+        ]
     
 
 if __name__ == "__main__":
     result = { "args": sys.argv[1:] }
     action = sys.argv[1]
-    prefix = sys.argv[-1] # last arg sent is the path prefix (depends on where we run the script from)
+    prefix = sys.argv[-1] if len(sys.argv) > 2 else "" # last arg sent is the path prefix (depends on where we run the script from)
     
     if action == 'generate-certificate':
         result['success'] = sys.argv[2] and CertificateServices.GenerateSignedCertificate(sys.argv[2], prefix=prefix)
@@ -217,3 +221,4 @@ if __name__ == "__main__":
         result['success'] = sys.argv[2] and CertificateServices.ConfirmNewCertificate(sys.argv[2], prefix=prefix)
 
     print(json.dumps(result))
+
