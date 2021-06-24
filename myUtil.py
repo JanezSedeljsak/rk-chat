@@ -204,6 +204,15 @@ class CertificateServices:
             for f in os.listdir(os.path.join(prefix, CERT_FILE_PATH)) 
             if re.match("[A-Za-z0-9]+\.unconfirmed_crt", f)
         ]
+    
+    @staticmethod
+    def getAllCertificates(prefix=""):
+        global CLIENTS_PEM, CERT_FILE_PATH
+        return [
+            f[:f.index('.crt')] 
+            for f in os.listdir(os.path.join(prefix, CERT_FILE_PATH)) 
+            if re.match("[A-Za-z0-9]+\.crt", f) and not any(protected in f for protected in {'server', 'admin'})
+        ]
 
     @staticmethod
     def getCertificate(name, prefix=""):
@@ -261,6 +270,9 @@ if __name__ == "__main__":
             result['success'] = False
             result['code'] = certRes[0]
             result['message'] = certRes[1]
+        
+    elif action == 'get-all-certificates':
+        result['members'] = sorted(CertificateServices.getAllCertificates(prefix=prefix))
         
 
     print(json.dumps(result))

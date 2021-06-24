@@ -60,7 +60,7 @@ app.service('$parser', function () {
 
 app.service('$appWindow', function ($window) {
     this.exit = () => $window.close();
-    this.minimize = () => ipcRenderer.send('request-minimize');
+    this.minimize = (winName="") => ipcRenderer.send(winName == 'admin' ? 'request-minimize-admin' : 'request-minimize');
 });
 
 app.service('$notification', function () {
@@ -109,10 +109,10 @@ app.service('$certService', function($notification) {
     this.getAllCertRequests = () => {
         const data = ipcRenderer.sendSync('call-certificate-service', { action: 'get-requested-certificates' });
         if ('certificates' in data && Array.isArray(data['certificates'])) {
-            return data;
+            return data['certificates'];
         }
 
-        $notification.show('normal', { icon: 'error', title: `Error occured while creating your certificate!` });
+        $notification.show('normal', { icon: 'error', title: `Error occured!` });
         return [];
     }
 
@@ -120,7 +120,7 @@ app.service('$certService', function($notification) {
         const data = ipcRenderer.sendSync('call-certificate-service', { certName, action: 'confirm-certificate' });
         if ('success' in data && data['success']) return;
 
-        $notification.show('normal', { icon: 'error', title: `Error occured while creating your certificate!` });
+        $notification.show('normal', { icon: 'error', title: `Error occured!` });
     };
 
     this.sendCertificateRequest = (certName) => {
@@ -149,5 +149,15 @@ app.service('$certService', function($notification) {
 
         $notification.show('normal', { icon: 'error', title: data['message'] });
         return undefined;
+    }
+
+    this.getAllCertificates = () => {
+        const data = ipcRenderer.sendSync('call-certificate-service', { action: 'get-all-certificates' });
+        if ('members' in data && Array.isArray(data['members'])) {
+            return data['members'];
+        }
+
+        $notification.show('normal', { icon: 'error', title: `Error occured!` });
+        return [];
     }
 });

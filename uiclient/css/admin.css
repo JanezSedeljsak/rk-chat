@@ -1,12 +1,50 @@
 body {
-    background-image: url(https://1.bp.blogspot.com/-E662PT_dVVc/VuZ4ZlrTnGI/AAAAAAAAAQA/pHtcc71uMTMvfdqFPEE9LfmQV3jhZ0s8Q/s1600/Lite%2BBackground.jpg);
+    background-image: url(https://fedoraproject.org/w/uploads/thumb/2/28/F8-wallpaper-day.png/800px-F8-wallpaper-day.png);
 }
 
 .list-group-item {
     background: transparent !important;
 }
 
+.my-container *:not(i) {
+    color: #ddd !important;
+}
+
 .my-container {
-    height: calc(100vh - 50px);
+    height: calc(100vh - 60px);
     overflow-y: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: calc(100% - 10px);
+    margin: 5px;
+}
+
+.my-inner-container {
+    margin: 3px;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+    flex: 1;
+    border-radius: 5px;
+    background-color: #8a84848a;
+    box-shadow: rgba(50, 50, 93, 0.45) 0px 2px 5px -1px, rgba(0, 0, 0, 0.6) 0px 1px 3px -1px;
+}
+
+#drag {
+    left: 12vw !important;
+    width: 88vw !important;
+}
+
+.active-user {
+    color: #49b625da;
+}
+
+.confirm-btn {
+    float: right;
+    color: #49b625da;
+}
+
+.confirm-btn:hover {
+    cursor: pointer;
 }

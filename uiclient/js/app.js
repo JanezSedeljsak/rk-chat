@@ -2,7 +2,6 @@ const app = angular.module("rkchat", []);
 const moment = require('moment');
 const html5tooltips = require('html5tooltipsjs');
 const tls = require('tls');
-const fs = require('fs');
 
 let tcpSocketClient = null;
 

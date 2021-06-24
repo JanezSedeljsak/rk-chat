@@ -30,46 +30,36 @@
                 <button data-tooltip="Minimize" class="fancy-header group-btn" ng-click="minimize()">
                     <i class="fas fa-minus-circle"></i>
                 </button>
-                <button data-tooltip="Refresh certificate requests" class="fancy-header group-btn" ng-click="refreshList()">
+                <button data-tooltip="Refresh" class="fancy-header group-btn" ng-click="refreshList()">
                     <i class="fas fa-redo-alt"></i>
                 </button>
+                <span style="font-size: 25px; margin-left: 10px" class="fancy-header">Admin app</span>
             </form>
         </div>
     </nav>
 
     <div class="my-container">
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">Cras justo odio</li>
-            <li class="list-group-item">Dapibus ac facilisis in</li>
-            <li class="list-group-item">Morbi leo risus</li>
-            <li class="list-group-item">Porta ac consectetur ac</li>
-            <li class="list-group-item">Vestibulum at eros</li>
-            <li class="list-group-item">Cras justo odio</li>
-            <li class="list-group-item">Dapibus ac facilisis in</li>
-            <li class="list-group-item">Morbi leo risus</li>
-            <li class="list-group-item">Porta ac consectetur ac</li>
-            <li class="list-group-item">Vestibulum at eros</li>
-            <li class="list-group-item">Cras justo odio</li>
-            <li class="list-group-item">Dapibus ac facilisis in</li>
-            <li class="list-group-item">Morbi leo risus</li>
-            <li class="list-group-item">Porta ac consectetur ac</li>
-            <li class="list-group-item">Vestibulum at eros</li>
-            <li class="list-group-item">Cras justo odio</li>
-            <li class="list-group-item">Dapibus ac facilisis in</li>
-            <li class="list-group-item">Morbi leo risus</li>
-            <li class="list-group-item">Porta ac consectetur ac</li>
-            <li class="list-group-item">Vestibulum at eros</li>
-            <li class="list-group-item">Cras justo odio</li>
-            <li class="list-group-item">Dapibus ac facilisis in</li>
-            <li class="list-group-item">Morbi leo risus</li>
-            <li class="list-group-item">Porta ac consectetur ac</li>
-            <li class="list-group-item">Vestibulum at eros</li>
-            <li class="list-group-item">Cras justo odio</li>
-            <li class="list-group-item">Dapibus ac facilisis in</li>
-            <li class="list-group-item">Morbi leo risus</li>
-            <li class="list-group-item">Porta ac consectetur ac</li>
-            <li class="list-group-item">Vestibulum at eros</li>
-        </ul>
+        <div class="my-inner-container">
+            <span style="font-size: 20px; margin-left: 10px" class="fancy-header">Cert requests</span>
+            <hr>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item" ng-repeat="cert in certFiles track by $index">
+                    {{ cert }}
+                    <i class="fas fa-check-double confirm-btn" ng-click="confirmCertificate(cert)"></i>
+                </li>
+            </ul>
+        </div>
+
+        <div class="my-inner-container">
+            <span style="font-size: 20px; margin-left: 10px" class="fancy-header">Currently online</span>
+            <hr>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item" ng-repeat="member in members track by $index">
+                    <i ng-class="{'active-user': online.has(member)}" class="fas fa-circle"></i>&nbsp;{{ member }}
+                </li>
+            </ul>
+        </div>
+     
     </div>
 
 </body>
