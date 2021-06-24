@@ -149,15 +149,21 @@ class CertificateServices:
     def GenerateSignedCertificate(name, prefix=""):
         global CLIENTS_PEM, CERT_FILE_PATH
         success = True
+        serialNumber = 0
+        validityStartInSeconds = 0
+        validityEndInSeconds = 10*365*24*60*60 # valid for 10 years
 
         try:
             k = crypto.PKey()
             k.generate_key(crypto.TYPE_RSA, 4096)
             cert = crypto.X509()
             cert.get_subject().CN = name.capitalize()
+            cert.set_serial_number(serialNumber)
+            cert.gmtime_adj_notBefore(0)
+            cert.gmtime_adj_notAfter(validityEndInSeconds)
             cert.set_issuer(cert.get_subject())
             cert.set_pubkey(k)
-            cert.sign(k, 'sha512') 
+            cert.sign(k, 'sha512')
 
             with open(os.path.join(prefix, CERT_FILE_PATH, f'{name.lower()}.unconfirmed_crt'), "wt") as f:
                 f.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert).decode("utf-8"))
@@ -191,8 +197,8 @@ class CertificateServices:
             f.write(f'\n{certContent.strip()}')
         
         # add content to server verified users
-        with open(prefix, CLIENTS_PEM, 'a') as f:
-            f.write(certContent)
+        with open(os.path.join(prefix, CERT_FILE_PATH, 'clients.pem'), 'a') as f:
+            f.write(f'\n{certContent[:-1]}')
         
         return True
 

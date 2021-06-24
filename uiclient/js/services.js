@@ -80,8 +80,10 @@ app.service('$notification', function () {
     this.show = function(type, settings, callback=() => {}) {
         const def = type in this.defaultSettingsByType ? this.defaultSettingsByType[type] : {};
         Swal.fire({ ...def, ...settings }).then(function(input){
-            if (!callback) return;
-            callback(input);
+            if (input.isConfirmed) {
+                if (!callback) return;
+                callback(input);
+            }
         }, () => {});
     }
 });
