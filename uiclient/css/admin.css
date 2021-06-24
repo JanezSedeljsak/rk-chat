@@ -1,0 +1,12 @@
+body {
+    background-image: url(https://1.bp.blogspot.com/-E662PT_dVVc/VuZ4ZlrTnGI/AAAAAAAAAQA/pHtcc71uMTMvfdqFPEE9LfmQV3jhZ0s8Q/s1600/Lite%2BBackground.jpg);
+}
+
+.list-group-item {
+    background: transparent !important;
+}
+
+.my-container {
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+}

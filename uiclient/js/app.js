@@ -4,34 +4,9 @@ const html5tooltips = require('html5tooltipsjs');
 const tls = require('tls');
 const fs = require('fs');
 
-const tcpSocketConfig = [3333, '127.0.0.1'];
-const crtFilesDirectory = './../public_cert/';
-
-const generateTlsOptions = (name, $notification) => {
-    if (fs.existsSync(`${crtFilesDirectory}${name}.unconfirmed_crt`)) {
-        $notification.show('normal', { icon: 'error', title: `Your account is not yet approved!`, timer: 1000 }, null);
-        return null;
-    }
-
-    if (!fs.existsSync(`${crtFilesDirectory}${name}.crt`)) {
-        $notification.show('normal', { icon: 'error', title: `Certificate does not exist!`, timer: 1000 }, null);
-        return null;
-    }
-
-    return {
-        host: tcpSocketConfig[1],
-        port: tcpSocketConfig[0],
-        cert: fs.readFileSync(`${crtFilesDirectory}${name}.crt`),
-        key: fs.readFileSync(`${crtFilesDirectory}${name}.key`),
-        ca: fs.readFileSync(`${crtFilesDirectory}server_cert.crt`),
-        secureProtocol: 'TLSv1_2_method',
-        rejectUnauthorized: false
-    };
-}
-
 let tcpSocketClient = null;
 
-app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notification, $adminApp) => {
+app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notification, $certService) => {
     $scope.initData = () => {
         $scope.userOnline = false;
         $scope.username = null;
@@ -43,7 +18,7 @@ app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notifi
     $scope.initData();
     $scope.exit = () => $appWindow.exit();
     $scope.minimize = () => $appWindow.minimize();
-    $scope.openAdmin = () => $adminApp.open();
+    $scope.openAdmin = () => $certService.openAdminApp();
     $scope.closeChat = (group) => delete $scope.groups[group]; 
     $scope.logout = () => {
         try {
@@ -56,13 +31,13 @@ app.controller("rkchat_controller", ($scope, $parser, $drag, $appWindow, $notifi
 
     $scope.register = () => {
         $notification.show('form', { title: 'Enter your username', confirmButtonText: 'Send request to admin' }, (input) => {
-            $adminApp.sendCertificateRequest(input.value);
+            $certService.sendCertificateRequest(input.value);
         });
     };
 
     $scope.enterChat = () => {
         $notification.show('form', { title: 'Enter your username', confirmButtonText: 'Enter chat' }, (input) => {
-            const tlsOptions = generateTlsOptions(input.value, $notification);
+            const tlsOptions = $certService.getUserCertificate(input.value);
             if (!tlsOptions) return;
             
             $scope.username = $parser.capFirstLetter(input.value);

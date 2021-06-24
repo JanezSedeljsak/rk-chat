@@ -2,19 +2,18 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const { PythonShell } =  require('python-shell');
 const BASE_PATH = './../';
 
-/*certificateService('get-requested-certificates', (res) => {
-    console.log(res);
-}, ['kekec'], BASE_PATH);*/
-
 require('electron-debug')({
     showDevTools: process.env.NODE_ENV === 'development'
 });
 
-function certificateService(actionName, callback, args=[], pathPrefix="") {
+async function certificateService({ actionName, args=[], pathPrefix="" }) {
     const options = { mode: 'text', args: [actionName, ...args, pathPrefix] };
-    PythonShell.run(`${BASE_PATH}myUtil.py`, options, (err, result) => {
-        if (err) throw err;
-        callback(JSON.parse(result));
+
+    return new Promise((resolve, reject) => {
+        PythonShell.run(`${BASE_PATH}myUtil.py`, options, (err, result) => {
+            if (err) throw err;
+            resolve(JSON.parse(result));
+        });
     });
 }
 
@@ -45,20 +44,10 @@ ipcMain.on('draw-admin', () => {
 ipcMain.on('request-minimize', () => win.minimize());
 ipcMain.on('request-minimize-admin', () => adminWin.minimize());
 
-ipcMain.on('generate-certificate', (_, data) => {
-    certificateService('generate-certificate', result => {
-        console.log(result);
-    }, [data['certName']], BASE_PATH);
-});
+ipcMain.on('call-certificate-service', async (event, data) => {
+    const params = { actionName: data['action'], args: [data['certName']], pathPrefix: BASE_PATH };
+    if ('certName' in data) params['args'] = [data['certName']];
 
-ipcMain.on('get-requested-certificates', () => {
-    certificateService('get-requested-certificates', result => {
-        console.log(result);
-    }, [], BASE_PATH);
-});
-
-ipcMain.on('confirm-certificate', (_ , data) => {
-    certificateService('confirm-certificate', result => {
-        console.log(result);
-    }, [data["certName"]], BASE_PATH);
+    const certServiceResult = await certificateService(params);
+    event.returnValue = certServiceResult;
 });

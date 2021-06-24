@@ -204,7 +204,39 @@ class CertificateServices:
             for f in os.listdir(os.path.join(prefix, CERT_FILE_PATH)) 
             if re.match("[A-Za-z0-9]+\.unconfirmed_crt", f)
         ]
-    
+
+    @staticmethod
+    def getCertificate(name, prefix=""):
+        messagesCode = ['SUCCESS', 'NOT_VERIFIED', 'NOT_FOUND', 'UNKNOWN_ERROR']
+        userMessage = ['', 'Your account is not yet approved!', 'Certificate does not exist!', 'Unknown error']
+
+        if os.path.isfile(os.path.join(prefix, CERT_FILE_PATH, f'{name.lower()}.unconfirmed_crt')):
+            return messagesCode[1], userMessage[1]
+        
+        if not os.path.isfile(os.path.join(prefix, CERT_FILE_PATH, f'{name.lower()}.crt')):
+            return messagesCode[2], userMessage[2]
+
+        result = {}
+        success = True
+
+        try:
+            with open(os.path.join(prefix, CERT_FILE_PATH, f'{name.lower()}.crt'), "r") as f:
+                result['cert'] = f.read()
+            
+            with open(os.path.join(prefix, CERT_FILE_PATH, f'{name.lower()}.key'), "r") as f:
+                result['key'] = f.read()
+                
+            with open(os.path.join(prefix, CERT_FILE_PATH, 'server_cert.crt'), "r") as f:
+                result['ca'] = f.read()
+        
+        except:
+            success = False
+
+        if not success:
+            return messagesCode[3], userMessage[3]
+
+        return messagesCode[0], result
+
 
 if __name__ == "__main__":
     result = { "args": sys.argv[1:] }
@@ -219,6 +251,17 @@ if __name__ == "__main__":
 
     elif action == 'confirm-certificate':
         result['success'] = sys.argv[2] and CertificateServices.ConfirmNewCertificate(sys.argv[2], prefix=prefix)
+
+    elif action == 'get-certificate':
+        certRes = CertificateServices.getCertificate(sys.argv[2], prefix=prefix)
+        if certRes[0] == 'SUCCESS':
+            result['success'] = True
+            result['certData'] = certRes[1]
+        else:
+            result['success'] = False
+            result['code'] = certRes[0]
+            result['message'] = certRes[1]
+        
 
     print(json.dumps(result))
 

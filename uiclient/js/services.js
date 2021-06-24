@@ -79,11 +79,14 @@ app.service('$notification', function () {
 
     this.show = function(type, settings, callback=() => {}) {
         const def = type in this.defaultSettingsByType ? this.defaultSettingsByType[type] : {};
-        Swal.fire({ ...def, ...settings }).then(callback);
+        Swal.fire({ ...def, ...settings }).then(function(input){
+            if (!callback) return;
+            callback(input);
+        }, () => {});
     }
 });
 
-app.service('$adminApp', function($notification) {
+app.service('$certService', function($notification) {
     this.myHash = s => {
         let a = 0, c = 0, o;
         for (let h = s.length - 1; h >= 0; h--) {
@@ -95,7 +98,7 @@ app.service('$adminApp', function($notification) {
         return `__${String(a).split("").reverse().join("")}__`;
     };
 
-    this.open = () => {
+    this.openAdminApp = () => {
         $notification.show('form', { title: 'Enter admin code', confirmButtonText: 'Open app', input: 'password' }, (input) => {
             if (this.myHash(input.value) == '__433063862__') {
                 ipcRenderer.send('draw-admin');
@@ -104,15 +107,47 @@ app.service('$adminApp', function($notification) {
     };
 
     this.getAllCertRequests = () => {
-        ipcRenderer.send('get-requested-certificates');
-        return ['neki', 'osem'];
+        const data = ipcRenderer.sendSync('call-certificate-service', { action: 'get-requested-certificates' });
+        if ('certificates' in data && Array.isArray(data['certificates'])) {
+            return data;
+        }
+
+        $notification.show('normal', { icon: 'error', title: `Error occured while creating your certificate!` });
+        return [];
     }
 
     this.confirmCertificate = (certName) => {
-        ipcRenderer.send('confirm-certificate');
-    }
+        const data = ipcRenderer.sendSync('call-certificate-service', { certName, action: 'confirm-certificate' });
+        if ('success' in data && data['success']) return;
+
+        $notification.show('normal', { icon: 'error', title: `Error occured while creating your certificate!` });
+    };
 
     this.sendCertificateRequest = (certName) => {
-        ipcRenderer.send('generate-certificate', { certName });
+        const data = ipcRenderer.sendSync('call-certificate-service', { certName, action: 'generate-certificate' });
+        if ('success' in data && data['success']) {
+            $notification.show('normal', { icon: 'success', title: `Your certificate was succesfully created!` });
+            return;
+        }
+
+        $notification.show('normal', { icon: 'error', title: `Error occured while creating your certificate!` });
     };
+
+    this.getUserCertificate = (certName) => {
+        const data = ipcRenderer.sendSync('call-certificate-service', { certName, action: 'get-certificate' });
+        if ('success' in data && data['success'] && 'certData' in data) {
+            const tcpSocketConfig = [3333, '127.0.0.1'];
+
+            return {
+                host: tcpSocketConfig[1],
+                port: tcpSocketConfig[0],
+                secureProtocol: 'TLSv1_2_method',
+                rejectUnauthorized: false,
+                ...data['certData']
+            };
+        }
+
+        $notification.show('normal', { icon: 'error', title: data['message'] });
+        return undefined;
+    }
 });
