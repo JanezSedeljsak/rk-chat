@@ -1,4 +1,4 @@
-## Tcp-socket-demo
+## RK-chat
 This is a basic example of using tcp-sockets. The server and terminal client are written in python. On top of that we also have a GUI client built with Electron (Node based framework) for a better user experience.
 
 The app comes with a basic communication system with the options of sending public messages or private messages directly to a specific receiver.
