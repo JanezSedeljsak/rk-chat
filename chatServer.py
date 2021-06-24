@@ -4,8 +4,11 @@ import threading
 import json
 from myUtil import RKChatHelpers, PORT
 
+admin = None
+clients = {}
+
 def client_thread(client_sock, client_addr):
-    global clients
+    global clients, admin
 
     print("[system] connected with " + client_addr[0] + ":" + str(client_addr[1]))
     print("[system] we now have " + str(len(clients)) + " clients")
@@ -51,6 +54,7 @@ def client_thread(client_sock, client_addr):
 
     with clients_lock:
         if admin == client_sock:
+            admin = None
             return
 
         left_name = clients[client_sock]
@@ -74,8 +78,6 @@ server_socket.bind(("localhost", PORT))
 server_socket.listen(1)
 
 print("[system] listening ...")
-admin = None
-clients = {}
 clients_lock = threading.Lock()
 while True:
     try:

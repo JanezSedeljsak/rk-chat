@@ -135,8 +135,8 @@ app.service('$certService', function($notification) {
         $notification.show('normal', { icon: 'error', title: `Error occured while creating your certificate!` });
     };
 
-    this.getUserCertificate = (certName) => {
-        const data = ipcRenderer.sendSync('call-certificate-service', { certName, action: 'get-certificate' });
+    this.getUserCertificate = (certName, allowAdmin=false) => {
+        const data = ipcRenderer.sendSync('call-certificate-service', { certName, action: 'get-certificate', allowAdmin });
         if ('success' in data && data['success'] && 'certData' in data) {
             const tcpSocketConfig = [3333, '127.0.0.1'];
 

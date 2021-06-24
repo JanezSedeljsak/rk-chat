@@ -225,9 +225,12 @@ class CertificateServices:
         ]
 
     @staticmethod
-    def getCertificate(name, prefix=""):
+    def getCertificate(name, prefix="", allowAdmin=False):
         messagesCode = ['SUCCESS', 'NOT_VERIFIED', 'NOT_FOUND', 'UNKNOWN_ERROR']
         userMessage = ['', 'Your account is not yet approved!', 'Certificate does not exist!', 'Unknown error']
+
+        if allowAdmin == False and any(name in proc for proc in {'admin', 'server'}):
+            return messagesCode[2], userMessage[2]
 
         if os.path.isfile(os.path.join(prefix, CERT_FILE_PATH, f'{name.lower()}.unconfirmed_crt')):
             return messagesCode[1], userMessage[1]
@@ -272,7 +275,7 @@ if __name__ == "__main__":
         result['success'] = sys.argv[2] and CertificateServices.ConfirmNewCertificate(sys.argv[2], prefix=prefix)
 
     elif action == 'get-certificate':
-        certRes = CertificateServices.getCertificate(sys.argv[2], prefix=prefix)
+        certRes = CertificateServices.getCertificate(sys.argv[2], prefix=prefix, allowAdmin=sys.argv[3]=='allow-admin')
         if certRes[0] == 'SUCCESS':
             result['success'] = True
             result['certData'] = certRes[1]
@@ -283,7 +286,6 @@ if __name__ == "__main__":
         
     elif action == 'get-all-certificates':
         result['members'] = sorted(CertificateServices.getAllCertificates(prefix=prefix))
-        
 
     print(json.dumps(result))
 

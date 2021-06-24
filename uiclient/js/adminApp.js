@@ -12,7 +12,7 @@ app.controller("admin_controller", ($scope, $appWindow, $certService, $parser) =
         $scope.initData();
     }
 
-    tcpSocketClient = tls.connect($certService.getUserCertificate('admin'), () => {});
+    tcpSocketClient = tls.connect($certService.getUserCertificate('admin', true), () => {});
     tcpSocketClient.on('error', function(error) {
         console.error(error);
         $notification.show('normal', { icon: 'error', title: `Error occured`, timer: 1000 }, null);

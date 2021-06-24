@@ -12,6 +12,7 @@ async function certificateService({ actionName, args=[], pathPrefix="" }) {
     return new Promise((resolve, reject) => {
         PythonShell.run(`${BASE_PATH}myUtil.py`, options, (err, result) => {
             if (err) throw err;
+            // console.log(result);
             resolve(JSON.parse(result));
         });
     });
@@ -45,8 +46,9 @@ ipcMain.on('request-minimize', () => win.minimize());
 ipcMain.on('request-minimize-admin', () => adminWin.minimize());
 
 ipcMain.on('call-certificate-service', async (event, data) => {
-    const params = { actionName: data['action'], args: [data['certName']], pathPrefix: BASE_PATH };
-    if ('certName' in data) params['args'] = [data['certName']];
+    const params = { actionName: data['action'], args: [], pathPrefix: BASE_PATH };
+    if ('certName' in data) params['args'].push(data['certName']);
+    if ('allowAdmin' in data && data['allowAdmin']) params['args'].push('allow-admin');
 
     const certServiceResult = await certificateService(params);
     event.returnValue = certServiceResult;
