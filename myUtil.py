@@ -126,6 +126,10 @@ class RKChatHelpers:
         RKChatHelpers.SendMessage(sock, data)
 
     @staticmethod
+    def MembersToList(membersDict):
+        return [memb.lower() for memb in membersDict.values()]
+
+    @staticmethod
     def GenerateSSLContext(crtFile="", keyFile="", isClientSide=True):
         global CERT_FILE_PATH
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)

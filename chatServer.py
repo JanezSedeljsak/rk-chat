@@ -49,11 +49,15 @@ def client_thread(client_sock, client_addr):
     except:
         pass
 
-
     with clients_lock:
+        if admin == client_sock:
+            return
+
         left_name = clients[client_sock]
         data = {'user_left': True, 'username': left_name }
         del clients[client_sock]
+        if admin:
+            RKChatHelpers.SendMessage(admin, {'members': RKChatHelpers.MembersToList(clients) })
         
         RKChatHelpers.FormatMessage(data, userLeft=True, printMessage=True)
         for client in clients:
@@ -61,7 +65,6 @@ def client_thread(client_sock, client_addr):
 
     print("[system] we now have " + str(len(clients)) + " clients")
     client_sock.close()
-
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -71,6 +74,7 @@ server_socket.bind(("localhost", PORT))
 server_socket.listen(1)
 
 print("[system] listening ...")
+admin = None
 clients = {}
 clients_lock = threading.Lock()
 while True:
@@ -82,13 +86,19 @@ while True:
             for key, value in sub:
                 if key == 'commonName': # (common name contains username)
                     with clients_lock:
-                        clients[client_sock] = value
-
-                        # send out user init message
-                        for client in clients:
-                            if client != client_sock:
-                                tmpData = { 'init_user': True, 'username': value }
-                                RKChatHelpers.SendMessage(client, tmpData)
+                        if value != 'Admin':
+                            clients[client_sock] = value
+                            RKChatHelpers.FormatMessage({'username': value }, isUserInit=True, printMessage=True)
+                            if admin:
+                                RKChatHelpers.SendMessage(admin, {'members': RKChatHelpers.MembersToList(clients) })
+                            # send out user init message
+                            for client in clients:
+                                if client != client_sock:
+                                    tmpData = { 'init_user': True, 'username': value }
+                                    RKChatHelpers.SendMessage(client, tmpData)
+                        else:
+                            admin = client_sock
+                            RKChatHelpers.SendMessage(admin, {'members': RKChatHelpers.MembersToList(clients) })
 
 
         thread = threading.Thread(target=client_thread, args=(client_sock, client_addr))
