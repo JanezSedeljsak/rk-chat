@@ -19,7 +19,7 @@ html {
   position: absolute;
   -webkit-app-region: drag;
   top: 0;
-  left: 15vw;
+  left: 20vw;
   height: 50px;
   width: 85vw;
   display: inline-block;

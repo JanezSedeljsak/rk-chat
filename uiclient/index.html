@@ -29,6 +29,12 @@
                 <button data-tooltip="Minimize" class="fancy-header group-btn" ng-click="minimize()">
                     <i class="fas fa-minus-circle"></i>
                 </button>
+                <button data-tooltip="Admin app" class="fancy-header group-btn" ng-click="openAdmin()">
+                    <i class="fas fa-user-secret"></i>
+                </button>
+                <button data-tooltip="Register" class="fancy-header group-btn" ng-click="register()">
+                    <i class="fas fa-address-card"></i>
+                </button>
                 <button data-tooltip="Logout" class="fancy-header group-btn"
                     ng-class="{'disabled': userOnline == false }" ng-click="logout()" ng-disabled="!userOnline">
                     <i class="fas fa-sign-out-alt"></i>

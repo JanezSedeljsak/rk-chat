@@ -82,3 +82,37 @@ app.service('$notification', function () {
         Swal.fire({ ...def, ...settings }).then(callback);
     }
 });
+
+app.service('$adminApp', function($notification) {
+    this.myHash = s => {
+        let a = 0, c = 0, o;
+        for (let h = s.length - 1; h >= 0; h--) {
+            o = s.charCodeAt(h);
+            a = (a << 6 & 268435455) + o + (o << 14);
+            c = a & 266338304;
+            a = c !== 0 ? a ^ c >> 21 : a;
+        }
+        return `__${String(a).split("").reverse().join("")}__`;
+    };
+
+    this.open = () => {
+        $notification.show('form', { title: 'Enter admin code', confirmButtonText: 'Open app', input: 'password' }, (input) => {
+            if (this.myHash(input.value) == '__433063862__') {
+                ipcRenderer.send('draw-admin');
+            }
+        });
+    };
+
+    this.getAllCertRequests = () => {
+        ipcRenderer.send('get-requested-certificates');
+        return ['neki', 'osem'];
+    }
+
+    this.confirmCertificate = (certName) => {
+        ipcRenderer.send('confirm-certificate');
+    }
+
+    this.sendCertificateRequest = (certName) => {
+        ipcRenderer.send('generate-certificate', { certName });
+    };
+});
